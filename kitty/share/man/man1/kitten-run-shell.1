@@ -1,0 +1,28 @@
+.TH "kitten-run-shell" "1" "May 31, 2024" "0.35.1" "kitten Manual"
+.SH Name
+kitten-run-shell \- Run the user\[aq]s shell with shell integration enabled
+.SH Usage
+.SY "kitten run-shell [options] [optional cmd to run before running the shell ...]"
+.YS
+.SH Description
+Run the users\[aq]s configured shell. If the shell supports shell integration, enable it based on the user\[aq]s configured shell_integration setting.
+.SH Options
+.TP
+.BI "--shell-integration" 
+Specify a value for the 
+.B shell_integration option, overriding the one from 
+.I kitty.conf.
+.TP
+.BI "--shell" " [=.]"
+Specify the shell command to run. The default value of . will use the parent shell if recognized, falling back to the value of the 
+.B shell option from 
+.I kitty.conf.
+.TP
+.BI "--env" 
+Specify an env var to set before running the shell. Of the form KEY=VAL. Can be specified multiple times. If no = is present KEY is unset.
+.TP
+.BI "--cwd" 
+The working directory to use when executing the shell.
+.TP
+.BI "--help, -h" 
+Show help for this command

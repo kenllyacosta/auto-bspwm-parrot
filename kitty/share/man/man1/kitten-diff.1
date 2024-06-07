@@ -1,0 +1,823 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "kitten-diff" 1 "May 31, 2024" "0.35.1" "kitty"
+.SH Name
+kitten-diff \- Pretty, side-by-side diffing of files and images
+.sp
+\fIA fast side\-by\-side diff tool with syntax highlighting and images\fP
+.SH Major features
+.INDENT 0.0
+.IP \(bu 2
+Displays diffs side\-by\-side in the kitty terminal
+.IP \(bu 2
+Does syntax highlighting of the displayed diffs, asynchronously, for
+maximum speed
+.IP \(bu 2
+Displays images as well as text diffs, even over SSH
+.IP \(bu 2
+Does recursive directory diffing
+.UNINDENT
+.INDENT 0.0
+.INDENT 2.5
+Screenshot, showing a sample diff (images not supported)
+.UNINDENT
+.UNINDENT
+.SH Installation
+.sp
+Simply \X'tty: link #quickstart'\fI\%install kitty\fP\X'tty: link'\&.
+.SH Usage
+.sp
+In the kitty terminal, run:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitten diff file1 file2
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+to see the diff between \fBfile1\fP and \fBfile2\fP\&.
+.sp
+Create an alias in your shell\(aqs startup file to shorten the command, for
+example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+alias d=\(dqkitten diff\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Now all you need to do to diff two files is:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+d file1 file2
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+You can also pass directories instead of files to see the recursive diff of the
+directory contents.
+.SH Keyboard controls
+.TS
+box center;
+l|l.
+T{
+Action
+T}	T{
+Shortcut
+T}
+_
+T{
+Quit
+T}	T{
+\fBQ\fP, \fBEsc\fP
+T}
+_
+T{
+Scroll line up
+T}	T{
+\fBK\fP, \fBUp\fP
+T}
+_
+T{
+Scroll line down
+T}	T{
+\fBJ\fP, \fBDown\fP
+T}
+_
+T{
+Scroll page up
+T}	T{
+\fBPgUp\fP
+T}
+_
+T{
+Scroll page down
+T}	T{
+\fBPgDn\fP
+T}
+_
+T{
+Scroll to top
+T}	T{
+\fBHome\fP
+T}
+_
+T{
+Scroll to bottom
+T}	T{
+\fBEnd\fP
+T}
+_
+T{
+Scroll to next page
+T}	T{
+\fBSpace\fP, \fBPgDn\fP
+T}
+_
+T{
+Scroll to previous page
+T}	T{
+\fBPgUp\fP
+T}
+_
+T{
+Scroll to next change
+T}	T{
+\fBN\fP
+T}
+_
+T{
+Scroll to previous change
+T}	T{
+\fBP\fP
+T}
+_
+T{
+Increase lines of context
+T}	T{
+\fB+\fP
+T}
+_
+T{
+Decrease lines of context
+T}	T{
+\fB\-\fP
+T}
+_
+T{
+All lines of context
+T}	T{
+\fBA\fP
+T}
+_
+T{
+Restore default context
+T}	T{
+\fB=\fP
+T}
+_
+T{
+Search forwards
+T}	T{
+\fB/\fP
+T}
+_
+T{
+Search backwards
+T}	T{
+\fB?\fP
+T}
+_
+T{
+Clear search
+T}	T{
+\fBEsc\fP
+T}
+_
+T{
+Scroll to next match
+T}	T{
+\fB>\fP, \fB\&.\fP
+T}
+_
+T{
+Scroll to previous match
+T}	T{
+\fB<\fP, \fB,\fP
+T}
+_
+T{
+Copy selection to clipboard
+T}	T{
+\fBy\fP
+T}
+_
+T{
+Copy selection or exit
+T}	T{
+\fBCtrl+C\fP
+T}
+.TE
+.SH Integrating with git
+.sp
+Add the following to \fB~/.gitconfig\fP:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+[diff]
+    tool = kitty
+    guitool = kitty.gui
+[difftool]
+    prompt = false
+    trustExitCode = true
+[difftool \(dqkitty\(dq]
+    cmd = kitten diff $LOCAL $REMOTE
+[difftool \(dqkitty.gui\(dq]
+    cmd = kitten diff $LOCAL $REMOTE
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Now to use kitty\-diff to view git diffs, you can simply do:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+git difftool \-\-no\-symlinks \-\-dir\-diff
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Once again, creating an alias for this command is useful.
+.SH Why does this work only in kitty?
+.sp
+The diff kitten makes use of various features that are \fI\%kitty only\fP, such as the \fI\%kitty graphics protocol\fP, the \fI\%extended keyboard protocol\fP, etc. It also leverages terminal program infrastructure
+I created for all of kitty\(aqs other kittens to reduce the amount of code needed
+(the entire implementation is under 3000 lines of code).
+.sp
+And fundamentally, it\(aqs kitty only because I wrote it for myself, and I am
+highly unlikely to use any other terminals :)
+.SH Configuration
+.sp
+You can configure the colors used, keyboard shortcuts, the diff implementation,
+the default lines of context, etc. by creating a \fBdiff.conf\fP file in your
+\X'tty: link #confloc'\fI\%kitty config folder\fP\X'tty: link'\&. See below for the supported configuration
+directives.
+.SH Diffing
+.INDENT 0.0
+.TP
+.B syntax_aliases
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+syntax_aliases pyj:py pyi:py recipe:py
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+File extension aliases for syntax highlight. For example, to syntax highlight
+\fBfile.xyz\fP as \fBfile.abc\fP use a setting of \fBxyz:abc\fP\&.
+Multiple aliases must be separated by spaces.
+.INDENT 0.0
+.TP
+.B num_context_lines
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+num_context_lines 3
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+The number of lines of context to show around each change.
+.INDENT 0.0
+.TP
+.B diff_cmd
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+diff_cmd auto
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+The diff command to use. Must contain the placeholder \fB_CONTEXT_\fP which
+will be replaced by the number of lines of context. A few special values are allowed:
+\fBauto\fP will automatically pick an available diff implementation. \fBbuiltin\fP
+will use the anchored diff algorithm from the Go standard library. \fBgit\fP will
+use the git command to do the diffing. \fBdiff\fP will use the diff command to
+do the diffing.
+.INDENT 0.0
+.TP
+.B replace_tab_by
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+replace_tab_by \ex20\ex20\ex20\ex20
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+The string to replace tabs with. Default is to use four spaces.
+.INDENT 0.0
+.TP
+.B ignore_name
+.UNINDENT
+.sp
+A glob pattern that is matched against only the filename of files and directories. Matching
+files and directories are ignored when scanning the filesystem to look for files to diff.
+Can be specified multiple times to use multiple patterns. For example:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+ignore_name .git
+ignore_name *~
+ignore_name *.pyc
+.EE
+.UNINDENT
+.UNINDENT
+.SH Colors
+.INDENT 0.0
+.TP
+.B pygments_style
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+pygments_style default
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+The pygments color scheme to use for syntax highlighting. See \X'tty: link https://pygments.org/styles/'\fI\%pygments builtin styles\fP\X'tty: link' for a list of schemes. Note that
+this \fBdoes not\fP change the colors used for diffing,
+only the colors used for syntax highlighting. To change the general colors use the settings below.
+.INDENT 0.0
+.TP
+.B foreground, background
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+foreground black
+background white
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Basic colors
+.INDENT 0.0
+.TP
+.B title_fg, title_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+title_fg black
+title_bg white
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Title colors
+.INDENT 0.0
+.TP
+.B margin_bg, margin_fg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+margin_bg #fafbfc
+margin_fg #aaaaaa
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Margin colors
+.INDENT 0.0
+.TP
+.B removed_bg, highlight_removed_bg, removed_margin_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+removed_bg           #ffeef0
+highlight_removed_bg #fdb8c0
+removed_margin_bg    #ffdce0
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Removed text backgrounds
+.INDENT 0.0
+.TP
+.B added_bg, highlight_added_bg, added_margin_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+added_bg           #e6ffed
+highlight_added_bg #acf2bd
+added_margin_bg    #cdffd8
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Added text backgrounds
+.INDENT 0.0
+.TP
+.B filler_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+filler_bg #fafbfc
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Filler (empty) line background
+.INDENT 0.0
+.TP
+.B margin_filler_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+margin_filler_bg none
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Filler (empty) line background in margins, defaults to the filler background
+.INDENT 0.0
+.TP
+.B hunk_margin_bg, hunk_bg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+hunk_margin_bg #dbedff
+hunk_bg        #f1f8ff
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Hunk header colors
+.INDENT 0.0
+.TP
+.B search_bg, search_fg, select_bg, select_fg
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+search_bg #444
+search_fg white
+select_bg #b4d5fe
+select_fg black
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Highlighting
+.SH Keyboard shortcuts
+.INDENT 0.0
+.TP
+.B Quit
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map q quit
+map esc quit
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll down
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map j scroll_by 1
+map down scroll_by 1
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll up
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map k scroll_by \-1
+map up scroll_by \-1
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to top
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map home scroll_to start
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to bottom
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map end scroll_to end
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to next page
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map page_down scroll_to next\-page
+map space scroll_to next\-page
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to previous page
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map page_up scroll_to prev\-page
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to next change
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map n scroll_to next\-change
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to previous change
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map p scroll_to prev\-change
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Show all context
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map a change_context all
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Show default context
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map = change_context default
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Increase context
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map + change_context 5
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Decrease context
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map \- change_context \-5
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Search forward
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map / start_search regex forward
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Search backward
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map ? start_search regex backward
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to next search match
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map . scroll_to next\-match
+map > scroll_to next\-match
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Scroll to previous search match
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map , scroll_to prev\-match
+map < scroll_to prev\-match
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Search forward (no regex)
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map f start_search substring forward
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Search backward (no regex)
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map b start_search substring backward
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Copy selection to clipboard
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map y copy_to_clipboard
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B Copy selection to clipboard or exit if no selection is present
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map ctrl+c copy_to_clipboard_or_exit
+.EE
+.UNINDENT
+.UNINDENT
+.SH Source code for diff
+.sp
+The source code for this kitten is \X'tty: link https://github.com/kovidgoyal/kitty/tree/master/kittens/diff'\fI\%available on GitHub\fP\X'tty: link'\&.
+.SH Command line interface
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitty +kitten diff [options] file_or_directory_left file_or_directory_right
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Show a side\-by\-side diff of the specified files/directories. You can also use ssh:hostname:remote\-file\-path to diff remote files.
+.SS Options
+.INDENT 0.0
+.TP
+.B \-\-context <CONTEXT>
+Number of lines of context to show between changes. Negative values use the number set in \fBdiff.conf\fP\&.
+Default: \fB\-1\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-config <CONFIG>
+Specify a path to the configuration file(s) to use. All configuration files are merged onto the builtin \fBdiff.conf\fP, overriding the builtin values. This option can be specified multiple times to read multiple configuration files in sequence, which are merged. Use the special value \fBNONE\fP to not load any config file.
+.sp
+If this option is not specified, config files are searched for in the order: \fB$XDG_CONFIG_HOME/kitty/diff.conf\fP, \fB~/.config/kitty/diff.conf\fP, \fB$XDG_CONFIG_DIRS/kitty/diff.conf\fP\&. The first one that exists is used as the config file.
+.sp
+If the environment variable \X'tty: link #envvar-KITTY_CONFIG_DIRECTORY'\fI\%KITTY_CONFIG_DIRECTORY\fP\X'tty: link' is specified, that directory is always used and the above searching does not happen.
+.sp
+If \fB/etc/xdg/kitty/diff.conf\fP exists, it is merged before (i.e. with lower priority) than any user config files. It can be used to specify system\-wide defaults for all users. You can use either \fB\-\fP or \fB/dev/stdin\fP to read the config from STDIN.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-override <OVERRIDE>, \-o <OVERRIDE>
+Override individual configuration options, can be specified multiple times. Syntax: name=value\&. For example: \-o background=gray
+.UNINDENT
+.SH Sample diff.conf
+.sp
+You can download a sample \fBdiff.conf\fP file with all default settings and
+comments describing each setting by clicking: \fBsample diff.conf\fP\&.
+.SH Author
+
+Kovid Goyal
+.SH Copyright
+
+2024, Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

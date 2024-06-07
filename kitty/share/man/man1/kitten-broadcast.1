@@ -1,0 +1,144 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "kitten-broadcast" 1 "May 31, 2024" "0.35.1" "kitty"
+.SH Name
+kitten-broadcast \- Broadcast typed text to kitty windows
+.SH Overview
+.sp
+\fIType text in all kitty windows simultaneously\fP
+.sp
+The \fBbroadcast\fP kitten can be used to type text simultaneously in all
+\X'tty: link #term-window'\fI\%kitty windows\fP\X'tty: link' (or a subset as desired).
+.sp
+To use it, simply create a mapping in \fBkitty.conf\fP such as:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map f1 launch \-\-allow\-remote\-control kitty +kitten broadcast
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Then press the \fBF1\fP key and whatever you type in the newly created window
+will be sent to all kitty windows.
+.sp
+You can use the options described below to control which windows are selected.
+.sp
+For example, only broadcast to other windows in the current tab:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map f1 launch \-\-allow\-remote\-control kitty +kitten broadcast \-\-match\-tab state:focused
+.EE
+.UNINDENT
+.UNINDENT
+.SH Source code for broadcast
+.sp
+The source code for this kitten is \X'tty: link https://github.com/kovidgoyal/kitty/tree/master/kittens/broadcast'\fI\%available on GitHub\fP\X'tty: link'\&.
+.SH Command line interface
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitty +kitten broadcast [options] [initial text to send ...]
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Broadcast typed text to kitty windows. By default text is sent to all windows, unless one of the matching options is specified
+.SS Options
+.INDENT 0.0
+.TP
+.B \-\-hide\-input\-toggle <HIDE_INPUT_TOGGLE>
+Key to press that will toggle hiding of the input in the broadcast window itself. Useful while typing a password, prevents the password from being visible on the screen.
+Default: \fBCtrl+Alt+Esc\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-end\-session <END_SESSION>
+Key to press to end the broadcast session.
+Default: \fBCtrl+Esc\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-match <MATCH>, \-m <MATCH>
+The window to match. Match specifications are of the form: field:query\&. Where field can be one of: \fBid\fP, \fBtitle\fP, \fBpid\fP, \fBcwd\fP, \fBcmdline\fP, \fBnum\fP, \fBenv\fP, \fBvar\fP, \fBstate\fP, \fBneighbor\fP, and \fBrecent\fP\&. query is the expression to match. Expressions can be either a number or a regular expression, and can be \X'tty: link #search-syntax'\fI\%combined using Boolean operators\fP\X'tty: link'\&.
+.sp
+The special value \fBall\fP matches all windows.
+.sp
+For numeric fields: \fBid\fP, \fBpid\fP, \fBnum\fP and \fBrecent\fP, the expression is interpreted as a number, not a regular expression. Negative values for \fBid\fP match from the highest id number down, in particular, \-1 is the most recently created window.
+.sp
+The field \fBnum\fP refers to the window position in the current tab, starting from zero and counting clockwise (this is the same as the order in which the windows are reported by the \X'tty: link #at-ls'\fI\%kitten @ ls\fP\X'tty: link' command).
+.sp
+The window id of the current window is available as the \X'tty: link #envvar-KITTY_WINDOW_ID'\fI\%KITTY_WINDOW_ID\fP\X'tty: link' environment variable.
+.sp
+The field \fBrecent\fP refers to recently active windows in the currently active tab, with zero being the currently active window, one being the previously active window and so on.
+.sp
+The field \fBneighbor\fP refers to a neighbor of the active window in the specified direction, which can be: \fBleft\fP, \fBright\fP, \fBtop\fP or \fBbottom\fP\&.
+.sp
+When using the \fBenv\fP field to match on environment variables, you can specify only the environment variable name or a name and value, for example, \fBenv:MY_ENV_VAR=2\fP\&.
+.sp
+Similarly, the \fBvar\fP field matches on user variables set on the window. You can specify name or name and value as with the \fBenv\fP field.
+.sp
+The field \fBstate\fP matches on the state of the window. Supported states are: \fBactive\fP, \fBfocused\fP, \fBneeds_attention\fP, \fBparent_active\fP, \fBparent_focused\fP, \fBself\fP, \fBoverlay_parent\fP\&.  Active windows are the windows that are active in their parent tab. There is only one focused window and it is the window to which keyboard events are delivered. If no window is focused, the last focused window is matched. The value \fBself\fP matches the window in which the remote control command is run. The value \fBoverlay_parent\fP matches the window that is under the \fBself\fP window, when the self window is an overlay.
+.sp
+Note that you can use the \X'tty: link #at-ls'\fI\%kitten @ ls\fP\X'tty: link' command to get a list of windows.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-match\-tab <MATCH_TAB>, \-t <MATCH_TAB>
+The tab to match. Match specifications are of the form: field:query\&. Where field can be one of: \fBid\fP, \fBindex\fP, \fBtitle\fP, \fBwindow_id\fP, \fBwindow_title\fP, \fBpid\fP, \fBcwd\fP, \fBcmdline\fP \fBenv\fP, \fBvar\fP, \fBstate\fP and \fBrecent\fP\&. query is the expression to match. Expressions can be either a number or a regular expression, and can be \X'tty: link #search-syntax'\fI\%combined using Boolean operators\fP\X'tty: link'\&.
+.sp
+The special value \fBall\fP matches all tabs.
+.sp
+For numeric fields: \fBid\fP, \fBindex\fP, \fBwindow_id\fP, \fBpid\fP and \fBrecent\fP, the expression is interpreted as a number, not a regular expression. Negative values for \fBid\fP/\fBwindow_id\fP match from the highest id number down, in particular, \-1 is the most recently created tab/window.
+.sp
+When using \fBtitle\fP or \fBid\fP, first a matching tab is looked for, and if not found a matching window is looked for, and the tab for that window is used.
+.sp
+You can also use \fBwindow_id\fP and \fBwindow_title\fP to match the tab that contains the window with the specified id or title.
+.sp
+The \fBindex\fP number is used to match the nth tab in the currently active OS window. The \fBrecent\fP number matches recently active tabs in the currently active OS window, with zero being the currently active tab, one the previously active tab and so on.
+.sp
+When using the \fBenv\fP field to match on environment variables, you can specify only the environment variable name or a name and value, for example, \fBenv:MY_ENV_VAR=2\fP\&. Tabs containing any window with the specified environment variables are matched. Similarly, \fBvar\fP matches tabs containing any window with the specified user variable.
+.sp
+The field \fBstate\fP matches on the state of the tab. Supported states are: \fBactive\fP, \fBfocused\fP, \fBneeds_attention\fP, \fBparent_active\fP and \fBparent_focused\fP\&. Active tabs are the tabs that are active in their parent OS window. There is only one focused tab and it is the tab to which keyboard events are delivered. If no tab is focused, the last focused tab is matched.
+.sp
+Note that you can use the \X'tty: link #at-ls'\fI\%kitten @ ls\fP\X'tty: link' command to get a list of tabs.
+.UNINDENT
+.SH Author
+
+Kovid Goyal
+.SH Copyright
+
+2024, Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

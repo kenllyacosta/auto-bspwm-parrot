@@ -1,0 +1,94 @@
+.TH "kitten-@-ls" "1" "May 31, 2024" "0.35.1" "kitten Manual"
+.SH Name
+kitten-@-ls \- List tabs/windows
+.SH Usage
+.SY "kitten @ ls "
+.YS
+.SH Description
+List windows. The list is returned as JSON tree. The top\-level is a list of operating system kitty windows. Each OS window has an id and a list of tabs. Each tab has its own id, a title and a list of windows. Each window has an id, title, current working directory, process id (PID), command\-line and environment of the process running in the window. Additionally, when running the command inside a kitty window, that window can be identified by the is_self parameter.
+
+You can use these criteria to select windows/tabs for the other commands.
+
+You can limit the windows/tabs in the output by using the 
+.B \-\-match and 
+.B \-\-match\-tab options.
+.SH Options
+.TP
+.BI "--all-env-vars" 
+Show all environment variables in output, not just differing ones.
+.TP
+.BI "--self" 
+Only list the window this command is run in.
+.TP
+.BI "--match, -m" 
+The window to match. Match specifications are of the form: field:query. Where field can be one of: id, title, pid, cwd, cmdline, num, env, var, state, neighbor, and recent. query is the expression to match. Expressions can be either a number or a regular expression, and can be combined using Boolean operators.
+
+The special value all matches all windows.
+
+For numeric fields: id, pid, num and recent, the expression is interpreted as a number, not a regular expression. Negative values for id match from the highest id number down, in particular, \-1 is the most recently created window.
+
+The field num refers to the window position in the current tab, starting from zero and counting clockwise (this is the same as the order in which the windows are reported by the kitten @ ls command).
+
+The window id of the current window is available as the 
+.B KITTY_WINDOW_ID environment variable.
+
+The field recent refers to recently active windows in the currently active tab, with zero being the currently active window, one being the previously active window and so on.
+
+The field neighbor refers to a neighbor of the active window in the specified direction, which can be: left, right, top or bottom.
+
+When using the env field to match on environment variables, you can specify only the environment variable name or a name and value, for example, env:MY_ENV_VAR=2.
+
+Similarly, the var field matches on user variables set on the window. You can specify name or name and value as with the env field.
+
+The field state matches on the state of the window. Supported states are: active, focused, needs_attention, parent_active, parent_focused, self, overlay_parent.  Active windows are the windows that are active in their parent tab. There is only one focused window and it is the window to which keyboard events are delivered. If no window is focused, the last focused window is matched. The value self matches the window in which the remote control command is run. The value overlay_parent matches the window that is under the self window, when the self window is an overlay.
+
+Note that you can use the kitten @ ls command to get a list of windows.
+.TP
+.BI "--match-tab, -t" 
+The tab to match. Match specifications are of the form: field:query. Where field can be one of: id, index, title, window_id, window_title, pid, cwd, cmdline env, var, state and recent. query is the expression to match. Expressions can be either a number or a regular expression, and can be combined using Boolean operators.
+
+The special value all matches all tabs.
+
+For numeric fields: id, index, window_id, pid and recent, the expression is interpreted as a number, not a regular expression. Negative values for id/window_id match from the highest id number down, in particular, \-1 is the most recently created tab/window.
+
+When using title or id, first a matching tab is looked for, and if not found a matching window is looked for, and the tab for that window is used.
+
+You can also use window_id and window_title to match the tab that contains the window with the specified id or title.
+
+The index number is used to match the nth tab in the currently active OS window. The recent number matches recently active tabs in the currently active OS window, with zero being the currently active tab, one the previously active tab and so on.
+
+When using the env field to match on environment variables, you can specify only the environment variable name or a name and value, for example, env:MY_ENV_VAR=2. Tabs containing any window with the specified environment variables are matched. Similarly, var matches tabs containing any window with the specified user variable.
+
+The field state matches on the state of the tab. Supported states are: active, focused, needs_attention, parent_active and parent_focused. Active tabs are the tabs that are active in their parent OS window. There is only one focused tab and it is the tab to which keyboard events are delivered. If no tab is focused, the last focused tab is matched.
+
+Note that you can use the kitten @ ls command to get a list of tabs.
+.TP
+.BI "--help, -h" 
+Show help for this command
+.SH Global options
+.TP
+.BI "--to" 
+An address for the kitty instance to control. Corresponds to the address given to the kitty instance via the 
+.B \-\-listen\-on option or the 
+.B listen_on setting in 
+.I kitty.conf. If not specified, the environment variable 
+.B KITTY_LISTEN_ON is checked. If that is also not found, messages are sent to the controlling terminal for this process, i.e. they will only work if this process is run within a kitty window.
+.TP
+.BI "--password" 
+A password to use when contacting kitty. This will cause kitty to ask the user for permission to perform the specified action, unless the password has been accepted before or is pre\-configured in 
+.I kitty.conf.
+.TP
+.BI "--password-file" " [=rc\-pass]"
+A file from which to read the password. Trailing whitespace is ignored. Relative paths are resolved from the kitty configuration directory. Use \- to read from STDIN. Used if no 
+.B \-\-password is supplied. Defaults to checking for the 
+.I rc\-pass file in the kitty configuration directory.
+.TP
+.BI "--password-env" " [=KITTY_RC_PASSWORD]"
+The name of an environment variable to read the password from. Used if no 
+.B \-\-password\-file is supplied. Defaults to checking the environment variable 
+.B KITTY_RC_PASSWORD.
+.TP
+.BI "--use-password" " [=if\-available]"
+If no password is available, kitty will usually just send the remote control command without a password. This option can be used to force it to always or never use the supplied password.
+
+Choices: if-available, always, never

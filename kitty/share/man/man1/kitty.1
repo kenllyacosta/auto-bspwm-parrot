@@ -1,0 +1,632 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "kitty" 1 "May 31, 2024" "0.35.1" "kitty"
+.SH Name
+kitty \- The fast, feature rich terminal emulator
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitty [options] [program\-to\-run ...]
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Run the kitty terminal emulator. You can also specify the
+program to run inside kitty as normal arguments
+following the options\&.
+For example: kitty \-\-hold sh \-c \(dqecho hello, world\(dq
+.sp
+For comprehensive documentation for kitty, please see: \X'tty: link https://sw.kovidgoyal.net/kitty/'\fI\%https://sw.kovidgoyal.net/kitty/\fP\X'tty: link'
+.SH Options
+.INDENT 0.0
+.TP
+.B \-\-app\-id <CLS>, \-\-class <CLS>
+Set the class part of the WM_CLASS window property. On Wayland, it sets the app id.
+Default: \fBkitty\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-name <NAME>
+Set the name part of the WM_CLASS property. Defaults to using the value from \fI\%kitty \-\-class\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-title <TITLE>, \-T <TITLE>
+Set the OS window title. This will override any title set by the program running inside kitty, permanently fixing the OS window\(aqs title. So only use this if you are running a program that does not set titles.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-config <CONFIG>, \-c <CONFIG>
+Specify a path to the configuration file(s) to use. All configuration files are merged onto the builtin \fBkitty.conf\fP, overriding the builtin values. This option can be specified multiple times to read multiple configuration files in sequence, which are merged. Use the special value \fBNONE\fP to not load any config file.
+.sp
+If this option is not specified, config files are searched for in the order: \fB$XDG_CONFIG_HOME/kitty/kitty.conf\fP, \fB~/.config/kitty/kitty.conf\fP, \fB$XDG_CONFIG_DIRS/kitty/kitty.conf\fP\&. The first one that exists is used as the config file.
+.sp
+If the environment variable \X'tty: link #envvar-KITTY_CONFIG_DIRECTORY'\fI\%KITTY_CONFIG_DIRECTORY\fP\X'tty: link' is specified, that directory is always used and the above searching does not happen.
+.sp
+If \fB/etc/xdg/kitty/kitty.conf\fP exists, it is merged before (i.e. with lower priority) than any user config files. It can be used to specify system\-wide defaults for all users. You can use either \fB\-\fP or \fB/dev/stdin\fP to read the config from STDIN.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-override <OVERRIDE>, \-o <OVERRIDE>
+Override individual configuration options, can be specified multiple times. Syntax: name=value\&. For example: \fI\%kitty \-o\fP font_size=20
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-directory <DIRECTORY>, \-\-working\-directory <DIRECTORY>, \-d <DIRECTORY>
+Change to the specified directory when launching.
+Default: \fB\&.\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-detach
+Detach from the controlling terminal, if any. Not available on macOS. On macOS use \fBopen \-a kitty.app \-n\fP instead.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-session <SESSION>
+Path to a file containing the startup session (tabs, windows, layout, programs). Use \- to read from STDIN. See \X'tty: link #sessions'\fI\%Startup Sessions\fP\X'tty: link' for details and an example. Environment variables in the file name are expanded, relative paths are resolved relative to the kitty configuration directory. The special value \fBnone\fP means no session will be used, even if the \X'tty: link #opt-kitty.startup_session'\fI\%startup_session\fP\X'tty: link' option has been specified in kitty.conf. Note that using this option means the command line arguments to kitty specifying a program to run are ignored.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-hold
+Remain open, at a shell prompt, after child process exits. Note that this only affects the first window. You can quit by either using the close window shortcut or running the exit command.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-single\-instance, \-1
+If specified only a single instance of kitty will run. New invocations will instead create a new top\-level window in the existing kitty instance. This allows kitty to share a single sprite cache on the GPU and also reduces startup time. You can also have separate groups of kitty instances by using the \fI\%kitty \-\-instance\-group\fP option.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-instance\-group <INSTANCE_GROUP>
+Used in combination with the \fI\%kitty \-\-single\-instance\fP option. All kitty invocations with the same \fI\%kitty \-\-instance\-group\fP will result in new windows being created in the first kitty instance within that group.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-wait\-for\-single\-instance\-window\-close
+Normally, when using \fI\%kitty \-\-single\-instance\fP, kitty will open a new window in an existing instance and quit immediately. With this option, it will not quit till the newly opened window is closed. Note that if no previous instance is found, then kitty will wait anyway, regardless of this option.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-listen\-on <LISTEN_ON>
+Listen on the specified socket address for control messages. For example, \fI\%kitty \-\-listen\-on\fP\fB=unix:/tmp/mykitty\fP or \fI\%kitty \-\-listen\-on\fP\fB=tcp:localhost:12345\fP\&. On Linux systems, you can also use abstract UNIX sockets, not associated with a file, like this: \fI\%kitty \-\-listen\-on\fP\fB=unix:@mykitty\fP\&. Environment variables are expanded and relative paths are resolved with respect to the temporary directory. To control kitty, you can send commands to it with kitten @ using the \X'tty: link #cmdoption-kitten-to'\fI\%kitten @ \-\-to\fP\X'tty: link' option to specify this address. Note that if you run kitten @ within a kitty window, there is no need to specify the \X'tty: link #cmdoption-kitten-to'\fI\%kitten @ \-\-to\fP\X'tty: link' option as it will automatically read from the environment. Note that this will be ignored unless \X'tty: link #opt-kitty.allow_remote_control'\fI\%allow_remote_control\fP\X'tty: link' is set to either: \fByes\fP, \fBsocket\fP or \fBsocket\-only\fP\&. This can also be specified in \fBkitty.conf\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-start\-as <START_AS>
+Control how the initial kitty window is created.
+Default: \fBnormal\fP
+Choices: \fBfullscreen\fP, \fBmaximized\fP, \fBminimized\fP, \fBnormal\fP
+.UNINDENT
+.SS Debugging options
+.INDENT 0.0
+.TP
+.B \-\-version, \-v
+The current kitty version.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-dump\-commands
+Output commands received from child process to STDOUT.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-replay\-commands <REPLAY_COMMANDS>
+Replay previously dumped commands. Specify the path to a dump file previously created by \fI\%kitty \-\-dump\-commands\fP\&. You can open a new kitty window to replay the commands with:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.EX
+kitty sh \-c \(dqkitty \-\-replay\-commands /path/to/dump/file; read\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-dump\-bytes <DUMP_BYTES>
+Path to file in which to store the raw bytes received from the child process.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-debug\-gl, \-\-debug\-rendering
+Debug rendering commands. This will cause all OpenGL calls to check for errors instead of ignoring them. Also prints out miscellaneous debug information. Useful when debugging rendering problems.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-debug\-input, \-\-debug\-keyboard
+Print out key and mouse events as they are received.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-debug\-font\-fallback
+Print out information about the selection of fallback fonts for characters not present in the main font.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-watcher <WATCHER>
+This option is deprecated in favor of the \X'tty: link #opt-kitty.watcher'\fI\%watcher\fP\X'tty: link' option in \fBkitty.conf\fP and should not be used.
+.UNINDENT
+.SH Tabs and windows
+.sp
+\fIkitty\fP is capable of running multiple programs organized into tabs and windows.
+The top level of organization is the \X'tty: link #term-os_window'\fI\%OS window\fP\X'tty: link'\&. Each OS
+window consists of one or more \X'tty: link #term-tab'\fI\%tabs\fP\X'tty: link'\&. Each tab consists of one or more
+\X'tty: link #term-window'\fI\%kitty windows\fP\X'tty: link'\&. The kitty windows can be arranged in multiple
+different \X'tty: link #term-layout'\fI\%layouts\fP\X'tty: link', like windows are organized in a tiling
+window manager. The keyboard controls (which are \X'tty: link #conf-kitty-shortcuts'\fI\%all customizable\fP\X'tty: link') for tabs and windows are:
+.SS Scrolling
+.TS
+box center;
+l|l.
+T{
+Action
+T}	T{
+Shortcut
+T}
+_
+T{
+Line up
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-line-up'\fI\%ctrl+shift+up\fP\X'tty: link' (also \fB⌥+⌘+⇞\fP and \fB⌘+↑\fP on macOS)
+T}
+_
+T{
+Line down
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-line-down'\fI\%ctrl+shift+down\fP\X'tty: link' (also \fB⌥+⌘+⇟\fP and \fB⌘+↓\fP on macOS)
+T}
+_
+T{
+Page up
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-page-up'\fI\%ctrl+shift+page_up\fP\X'tty: link' (also \fB⌘+⇞\fP on macOS)
+T}
+_
+T{
+Page down
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-page-down'\fI\%ctrl+shift+page_down\fP\X'tty: link' (also \fB⌘+⇟\fP on macOS)
+T}
+_
+T{
+Top
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-to-top'\fI\%ctrl+shift+home\fP\X'tty: link' (also \fB⌘+↖\fP on macOS)
+T}
+_
+T{
+Bottom
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-to-bottom'\fI\%ctrl+shift+end\fP\X'tty: link' (also \fB⌘+↘\fP on macOS)
+T}
+_
+T{
+Previous shell prompt
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-to-previous-shell-prompt'\fI\%ctrl+shift+z\fP\X'tty: link' (see \X'tty: link #shell-integration'\fI\%Shell integration\fP\X'tty: link')
+T}
+_
+T{
+Next shell prompt
+T}	T{
+\X'tty: link #shortcut-kitty.Scroll-to-next-shell-prompt'\fI\%ctrl+shift+x\fP\X'tty: link' (see \X'tty: link #shell-integration'\fI\%Shell integration\fP\X'tty: link')
+T}
+_
+T{
+Browse scrollback in less
+T}	T{
+\X'tty: link #shortcut-kitty.Browse-scrollback-buffer-in-pager'\fI\%ctrl+shift+h\fP\X'tty: link'
+T}
+_
+T{
+Browse last cmd output
+T}	T{
+\X'tty: link #shortcut-kitty.Browse-output-of-the-last-shell-command-in-pager'\fI\%ctrl+shift+g\fP\X'tty: link' (see \X'tty: link #shell-integration'\fI\%Shell integration\fP\X'tty: link')
+T}
+.TE
+.sp
+The scroll actions only take effect when the terminal is in the main screen.
+When the alternate screen is active (for example when using a full screen
+program like an editor) the key events are instead passed to program running in the
+terminal.
+.SS Tabs
+.TS
+box center;
+l|l.
+T{
+Action
+T}	T{
+Shortcut
+T}
+_
+T{
+New tab
+T}	T{
+\X'tty: link #shortcut-kitty.New-tab'\fI\%ctrl+shift+t\fP\X'tty: link' (also \fB⌘+t\fP on macOS)
+T}
+_
+T{
+Close tab
+T}	T{
+\X'tty: link #shortcut-kitty.Close-tab'\fI\%ctrl+shift+q\fP\X'tty: link' (also \fB⌘+w\fP on macOS)
+T}
+_
+T{
+Next tab
+T}	T{
+\X'tty: link #shortcut-kitty.Next-tab'\fI\%ctrl+shift+right\fP\X'tty: link' (also \fB⌃+⇥\fP and \fB⇧+⌘+]\fP on macOS)
+T}
+_
+T{
+Previous tab
+T}	T{
+\X'tty: link #shortcut-kitty.Previous-tab'\fI\%ctrl+shift+left\fP\X'tty: link' (also \fB⇧+⌃+⇥\fP and \fB⇧+⌘+[\fP on macOS)
+T}
+_
+T{
+Next layout
+T}	T{
+\X'tty: link #shortcut-kitty.Next-layout'\fI\%ctrl+shift+l\fP\X'tty: link'
+T}
+_
+T{
+Move tab forward
+T}	T{
+\X'tty: link #shortcut-kitty.Move-tab-forward'\fI\%ctrl+shift+.\fP\X'tty: link'
+T}
+_
+T{
+Move tab backward
+T}	T{
+\X'tty: link #shortcut-kitty.Move-tab-backward'\fI\%ctrl+shift+,\fP\X'tty: link'
+T}
+_
+T{
+Set tab title
+T}	T{
+\X'tty: link #shortcut-kitty.Set-tab-title'\fI\%ctrl+shift+alt+t\fP\X'tty: link' (also \fB⇧+⌘+i\fP on macOS)
+T}
+.TE
+.SS Windows
+.TS
+box center;
+l|l.
+T{
+Action
+T}	T{
+Shortcut
+T}
+_
+T{
+New window
+T}	T{
+\X'tty: link #shortcut-kitty.New-window'\fI\%ctrl+shift+enter\fP\X'tty: link' (also \fB⌘+↩\fP on macOS)
+T}
+_
+T{
+New OS window
+T}	T{
+\X'tty: link #shortcut-kitty.New-OS-window'\fI\%ctrl+shift+n\fP\X'tty: link' (also \fB⌘+n\fP on macOS)
+T}
+_
+T{
+Close window
+T}	T{
+\X'tty: link #shortcut-kitty.Close-window'\fI\%ctrl+shift+w\fP\X'tty: link' (also \fB⇧+⌘+d\fP on macOS)
+T}
+_
+T{
+Resize window
+T}	T{
+\X'tty: link #shortcut-kitty.Start-resizing-window'\fI\%ctrl+shift+r\fP\X'tty: link' (also \fB⌘+r\fP on macOS)
+T}
+_
+T{
+Next window
+T}	T{
+\X'tty: link #shortcut-kitty.Next-window'\fI\%ctrl+shift+]\fP\X'tty: link'
+T}
+_
+T{
+Previous window
+T}	T{
+\X'tty: link #shortcut-kitty.Previous-window'\fI\%ctrl+shift+[\fP\X'tty: link'
+T}
+_
+T{
+Move window forward
+T}	T{
+\X'tty: link #shortcut-kitty.Move-window-forward'\fI\%ctrl+shift+f\fP\X'tty: link'
+T}
+_
+T{
+Move window backward
+T}	T{
+\X'tty: link #shortcut-kitty.Move-window-backward'\fI\%ctrl+shift+b\fP\X'tty: link'
+T}
+_
+T{
+Move window to top
+T}	T{
+\X'tty: link #shortcut-kitty.Move-window-to-top'\fI\%ctrl+shift+\(ga\fP\X'tty: link'
+T}
+_
+T{
+Visually focus window
+T}	T{
+\X'tty: link #shortcut-kitty.Visually-select-and-focus-window'\fI\%ctrl+shift+f7\fP\X'tty: link'
+T}
+_
+T{
+Visually swap window
+T}	T{
+\X'tty: link #shortcut-kitty.Visually-swap-window-with-another'\fI\%ctrl+shift+f8\fP\X'tty: link'
+T}
+_
+T{
+Focus specific window
+T}	T{
+\X'tty: link #shortcut-kitty.First-window'\fI\%ctrl+shift+1\fP\X'tty: link', \X'tty: link #shortcut-kitty.Second-window'\fI\%ctrl+shift+2\fP\X'tty: link' ... \X'tty: link #shortcut-kitty.Tenth-window'\fI\%ctrl+shift+0\fP\X'tty: link'
+(also \fB⌘+1\fP, \fB⌘+2\fP ... \fB⌘+9\fP on macOS)
+(clockwise from the top\-left)
+T}
+.TE
+.sp
+Additionally, you can define shortcuts in \fBkitty.conf\fP to focus
+neighboring windows and move windows around (similar to window movement in
+\fBvim\fP):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map ctrl+left neighboring_window left
+map shift+left move_window right
+map ctrl+down neighboring_window down
+map shift+down move_window up
+\&...
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+You can also define a shortcut to switch to the previously active window:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map ctrl+p nth_window \-1
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+\X'tty: link #action-nth_window'\fI\%nth_window\fP\X'tty: link' will focus the nth window for positive numbers (starting from
+zero) and the previously active windows for negative numbers.
+.sp
+To switch to the nth OS window, you can define \X'tty: link #action-nth_os_window'\fI\%nth_os_window\fP\X'tty: link'\&. Only
+positive numbers are accepted, starting from one.
+.sp
+You can define shortcuts to detach the current window and move it to another tab
+or another OS window:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+# moves the window into a new OS window
+map ctrl+f2 detach_window
+# moves the window into a new tab
+map ctrl+f3 detach_window new\-tab
+# moves the window into the previously active tab
+map ctrl+f3 detach_window tab\-prev
+# moves the window into the tab at the left of the active tab
+map ctrl+f3 detach_window tab\-left
+# moves the window into a new tab created to the left of the active tab
+map ctrl+f3 detach_window new\-tab\-left
+# asks which tab to move the window into
+map ctrl+f4 detach_window ask
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Similarly, you can detach the current tab, with:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+# moves the tab into a new OS window
+map ctrl+f2 detach_tab
+# asks which OS Window to move the tab into
+map ctrl+f4 detach_tab ask
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Finally, you can define a shortcut to close all windows in a tab other than the
+currently active window:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+map f9 close_other_windows_in_tab
+.EE
+.UNINDENT
+.UNINDENT
+.SH Other keyboard shortcuts
+.sp
+The full list of actions that can be mapped to key presses is available
+\fI\%here\fP\&. To learn how to do more sophisticated keyboard
+mappings, such as modal mappings, per application mappings, etc. see
+\fI\%Making your keyboard dance\fP\&.
+.TS
+box center;
+l|l.
+T{
+Action
+T}	T{
+Shortcut
+T}
+_
+T{
+Show this help
+T}	T{
+\X'tty: link #shortcut-kitty.Show-documentation'\fI\%ctrl+shift+f1\fP\X'tty: link'
+T}
+_
+T{
+Copy to clipboard
+T}	T{
+\X'tty: link #shortcut-kitty.Copy-to-clipboard'\fI\%ctrl+shift+c\fP\X'tty: link' (also \fB⌘+c\fP on macOS)
+T}
+_
+T{
+Paste from clipboard
+T}	T{
+\X'tty: link #shortcut-kitty.Paste-from-clipboard'\fI\%ctrl+shift+v\fP\X'tty: link' (also \fB⌘+v\fP on macOS)
+T}
+_
+T{
+Paste from selection
+T}	T{
+\X'tty: link #shortcut-kitty.Paste-from-selection'\fI\%ctrl+shift+s\fP\X'tty: link'
+T}
+_
+T{
+Pass selection to program
+T}	T{
+\X'tty: link #shortcut-kitty.Pass-selection-to-program'\fI\%ctrl+shift+o\fP\X'tty: link'
+T}
+_
+T{
+Increase font size
+T}	T{
+\X'tty: link #shortcut-kitty.Increase-font-size'\fI\%ctrl+shift+equal\fP\X'tty: link' (also \fB⌘++\fP on macOS)
+T}
+_
+T{
+Decrease font size
+T}	T{
+\X'tty: link #shortcut-kitty.Decrease-font-size'\fI\%ctrl+shift+minus\fP\X'tty: link' (also \fB⌘+\-\fP on macOS)
+T}
+_
+T{
+Restore font size
+T}	T{
+\X'tty: link #shortcut-kitty.Reset-font-size'\fI\%ctrl+shift+backspace\fP\X'tty: link' (also \fB⌘+0\fP on macOS)
+T}
+_
+T{
+Toggle fullscreen
+T}	T{
+\X'tty: link #shortcut-kitty.Toggle-fullscreen'\fI\%ctrl+shift+f11\fP\X'tty: link' (also \fB⌃+⌘+f\fP on macOS)
+T}
+_
+T{
+Toggle maximized
+T}	T{
+\X'tty: link #shortcut-kitty.Toggle-maximized'\fI\%ctrl+shift+f10\fP\X'tty: link'
+T}
+_
+T{
+Input Unicode character
+T}	T{
+\X'tty: link #shortcut-kitty.Unicode-input'\fI\%ctrl+shift+u\fP\X'tty: link' (also \fB⌃+⌘+space\fP on macOS)
+T}
+_
+T{
+Open URL in web browser
+T}	T{
+\X'tty: link #shortcut-kitty.Open-URL'\fI\%ctrl+shift+e\fP\X'tty: link'
+T}
+_
+T{
+Reset the terminal
+T}	T{
+\X'tty: link #shortcut-kitty.Reset-the-terminal'\fI\%ctrl+shift+delete\fP\X'tty: link' (also \fB⌥+⌘+r\fP on macOS)
+T}
+_
+T{
+Edit \fBkitty.conf\fP
+T}	T{
+\X'tty: link #shortcut-kitty.Edit-config-file'\fI\%ctrl+shift+f2\fP\X'tty: link' (also \fB⌘+,\fP on macOS)
+T}
+_
+T{
+Reload \fBkitty.conf\fP
+T}	T{
+\X'tty: link #shortcut-kitty.Reload-kitty.conf'\fI\%ctrl+shift+f5\fP\X'tty: link' (also \fB⌃+⌘+,\fP on macOS)
+T}
+_
+T{
+Debug \fBkitty.conf\fP
+T}	T{
+\X'tty: link #shortcut-kitty.Debug-kitty-configuration'\fI\%ctrl+shift+f6\fP\X'tty: link' (also \fB⌥+⌘+,\fP on macOS)
+T}
+_
+T{
+Open a \fIkitty\fP shell
+T}	T{
+\X'tty: link #shortcut-kitty.Open-the-kitty-command-shell'\fI\%ctrl+shift+escape\fP\X'tty: link'
+T}
+_
+T{
+Increase background opacity
+T}	T{
+\X'tty: link #shortcut-kitty.Increase-background-opacity'\fI\%ctrl+shift+a>m\fP\X'tty: link'
+T}
+_
+T{
+Decrease background opacity
+T}	T{
+\X'tty: link #shortcut-kitty.Decrease-background-opacity'\fI\%ctrl+shift+a>l\fP\X'tty: link'
+T}
+_
+T{
+Full background opacity
+T}	T{
+\X'tty: link #shortcut-kitty.Make-background-fully-opaque'\fI\%ctrl+shift+a>1\fP\X'tty: link'
+T}
+_
+T{
+Reset background opacity
+T}	T{
+\X'tty: link #shortcut-kitty.Reset-background-opacity'\fI\%ctrl+shift+a>d\fP\X'tty: link'
+T}
+.TE
+.SH See also
+.sp
+See kitty.conf(5)
+.SH Author
+
+Kovid Goyal
+.SH Copyright
+
+2024, Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

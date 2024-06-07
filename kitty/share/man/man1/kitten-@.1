@@ -1,0 +1,202 @@
+.TH "kitten-@" "1" "May 31, 2024" "0.35.1" "kitten Manual"
+.SH Name
+kitten-@ \- Control kitty remotely
+.SH Usage
+.SY "kitten @ [global options] [sub-command] [sub-command options] [sub-command args]"
+.YS
+.SH Description
+Control kitty by sending it commands. Set the allow_remote_control option in 
+.I kitty.conf for this to work. When run without any sub\-commands this will start an interactive shell to control kitty.
+.SH Commands
+.TP 2
+action
+Run the specified mappable action. See: 
+.MR kitten-@-action 1
+.TP 2
+close-tab
+Close the specified tabs. See: 
+.MR kitten-@-close-tab 1
+.TP 2
+close-window
+Close the specified windows. See: 
+.MR kitten-@-close-window 1
+.TP 2
+create-marker
+Create a marker that highlights specified text. See: 
+.MR kitten-@-create-marker 1
+.TP 2
+detach-tab
+Detach the specified tabs and place them in a different/new OS window. See: 
+.MR kitten-@-detach-tab 1
+.TP 2
+detach-window
+Detach the specified windows and place them in a different/new tab. See: 
+.MR kitten-@-detach-window 1
+.TP 2
+disable-ligatures
+Control ligature rendering. See: 
+.MR kitten-@-disable-ligatures 1
+.TP 2
+env
+Change environment variables seen by future children. See: 
+.MR kitten-@-env 1
+.TP 2
+focus-tab
+Focus the specified tab. See: 
+.MR kitten-@-focus-tab 1
+.TP 2
+focus-window
+Focus the specified window. See: 
+.MR kitten-@-focus-window 1
+.TP 2
+get-colors
+Get terminal colors. See: 
+.MR kitten-@-get-colors 1
+.TP 2
+get-text
+Get text from the specified window. See: 
+.MR kitten-@-get-text 1
+.TP 2
+goto-layout
+Set the window layout. See: 
+.MR kitten-@-goto-layout 1
+.TP 2
+kitten
+Run a kitten. See: 
+.MR kitten-@-kitten 1
+.TP 2
+last-used-layout
+Switch to the last used layout. See: 
+.MR kitten-@-last-used-layout 1
+.TP 2
+launch
+Run an arbitrary process in a new window/tab. See: 
+.MR kitten-@-launch 1
+.TP 2
+load-config
+(Re)load a config file. See: 
+.MR kitten-@-load-config 1
+.TP 2
+ls
+List tabs/windows. See: 
+.MR kitten-@-ls 1
+.TP 2
+new-window
+Open new window. See: 
+.MR kitten-@-new-window 1
+.TP 2
+remove-marker
+Remove the currently set marker, if any.. See: 
+.MR kitten-@-remove-marker 1
+.TP 2
+resize-os-window
+Resize the specified OS Windows. See: 
+.MR kitten-@-resize-os-window 1
+.TP 2
+resize-window
+Resize the specified windows. See: 
+.MR kitten-@-resize-window 1
+.TP 2
+run
+Run a program on the computer in which kitty is running and get the output. See: 
+.MR kitten-@-run 1
+.TP 2
+scroll-window
+Scroll the specified windows. See: 
+.MR kitten-@-scroll-window 1
+.TP 2
+select-window
+Visually select a window in the specified tab. See: 
+.MR kitten-@-select-window 1
+.TP 2
+send-key
+Send arbitrary key presses to the specified windows. See: 
+.MR kitten-@-send-key 1
+.TP 2
+send-text
+Send arbitrary text to specified windows. See: 
+.MR kitten-@-send-text 1
+.TP 2
+set-background-image
+Set the background image. See: 
+.MR kitten-@-set-background-image 1
+.TP 2
+set-background-opacity
+Set the background opacity. See: 
+.MR kitten-@-set-background-opacity 1
+.TP 2
+set-colors
+Set terminal colors. See: 
+.MR kitten-@-set-colors 1
+.TP 2
+set-enabled-layouts
+Set the enabled layouts in tabs. See: 
+.MR kitten-@-set-enabled-layouts 1
+.TP 2
+set-font-size
+Set the font size in the active top\-level OS window. See: 
+.MR kitten-@-set-font-size 1
+.TP 2
+set-spacing
+Set window paddings and margins. See: 
+.MR kitten-@-set-spacing 1
+.TP 2
+set-tab-color
+Change the color of the specified tabs in the tab bar. See: 
+.MR kitten-@-set-tab-color 1
+.TP 2
+set-tab-title
+Set the tab title. See: 
+.MR kitten-@-set-tab-title 1
+.TP 2
+set-user-vars
+Set user variables on a window. See: 
+.MR kitten-@-set-user-vars 1
+.TP 2
+set-window-logo
+Set the window logo. See: 
+.MR kitten-@-set-window-logo 1
+.TP 2
+set-window-title
+Set the window title. See: 
+.MR kitten-@-set-window-title 1
+.TP 2
+signal-child
+Send a signal to the foreground process in the specified windows. See: 
+.MR kitten-@-signal-child 1
+.PP
+Get help for an individual command by running:
+.SY kitten @
+command -h
+.YS
+.SH Global options
+.TP
+.BI "--to" 
+An address for the kitty instance to control. Corresponds to the address given to the kitty instance via the 
+.B \-\-listen\-on option or the 
+.B listen_on setting in 
+.I kitty.conf. If not specified, the environment variable 
+.B KITTY_LISTEN_ON is checked. If that is also not found, messages are sent to the controlling terminal for this process, i.e. they will only work if this process is run within a kitty window.
+.TP
+.BI "--password" 
+A password to use when contacting kitty. This will cause kitty to ask the user for permission to perform the specified action, unless the password has been accepted before or is pre\-configured in 
+.I kitty.conf.
+.TP
+.BI "--password-file" " [=rc\-pass]"
+A file from which to read the password. Trailing whitespace is ignored. Relative paths are resolved from the kitty configuration directory. Use \- to read from STDIN. Used if no 
+.B \-\-password is supplied. Defaults to checking for the 
+.I rc\-pass file in the kitty configuration directory.
+.TP
+.BI "--password-env" " [=KITTY_RC_PASSWORD]"
+The name of an environment variable to read the password from. Used if no 
+.B \-\-password\-file is supplied. Defaults to checking the environment variable 
+.B KITTY_RC_PASSWORD.
+.TP
+.BI "--use-password" " [=if\-available]"
+If no password is available, kitty will usually just send the remote control command without a password. This option can be used to force it to always or never use the supplied password.
+
+Choices: if-available, always, never
+.SH Options
+.TP
+.BI "--help, -h" 
+Show help for this command

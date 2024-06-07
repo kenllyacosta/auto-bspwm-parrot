@@ -1,0 +1,180 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "kitten-clipboard" 1 "May 31, 2024" "0.35.1" "kitty"
+.SH Name
+kitten-clipboard \- Copy/paste with the system clipboard, even over SSH
+.SH Overview
+.sp
+\fICopy/paste to the system clipboard from shell scripts\fP
+.sp
+The \fBclipboard\fP kitten can be used to read or write to the system clipboard
+from the shell. It even works over SSH. Using it is as simple as:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+echo hooray | kitten clipboard
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+All text received on \fBSTDIN\fP is copied to the clipboard.
+.sp
+To get text from the clipboard:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitten clipboard \-\-get\-clipboard
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+The text will be written to \fBSTDOUT\fP\&. Note that by default kitty asks for
+permission when a program attempts to read the clipboard. This can be
+controlled via \X'tty: link #opt-kitty.clipboard_control'\fI\%clipboard_control\fP\X'tty: link'\&.
+.sp
+Added in version 0.27.0: Support for copying arbitrary data types
+
+.sp
+The clipboard kitten can be used to send/receive
+more than just plain text from the system clipboard. You can transfer arbitrary
+data types. Best illustrated with some examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+# Copy an image to the clipboard:
+kitten clipboard picture.png
+
+# Copy an image and some text to the clipboard:
+kitten clipboard picture.jpg text.txt
+
+# Copy text from STDIN and an image to the clipboard:
+echo hello | kitten clipboard picture.png /dev/stdin
+
+# Copy any raster image available on the clipboard to a PNG file:
+kitten clipboard \-g picture.png
+
+# Copy an image to a file and text to STDOUT:
+kitten clipboard \-g picture.png /dev/stdout
+
+# List the formats available on the system clipboard
+kitten clipboard \-g \-m . /dev/stdout
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Normally, the kitten guesses MIME types based on the file names. To control the
+MIME types precisely, use the \fI\%\-\-mime\fP option.
+.sp
+This kitten uses a new protocol developed by kitty to function, for details,
+see \fI\%Copying all data types to the clipboard\fP\&.
+.SH Source code for clipboard
+.sp
+The source code for this kitten is \X'tty: link https://github.com/kovidgoyal/kitty/tree/master/kittens/clipboard'\fI\%available on GitHub\fP\X'tty: link'\&.
+.SH Command line interface
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitty +kitten clipboard [options] [files to copy to/from]
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Read or write to the system clipboard.
+.sp
+This kitten operates most simply in filter mode\&.
+To set the clipboard text, pipe in the new text on \fBSTDIN\fP\&. Use the
+\fI\%\-\-get\-clipboard\fP option to instead output the current clipboard text content to
+\fBSTDOUT\fP\&. Note that copying from the clipboard will cause a permission
+popup, see \X'tty: link #opt-kitty.clipboard_control'\fI\%clipboard_control\fP\X'tty: link' for details.
+.sp
+For more control, specify filename arguments. Then, different MIME types can be copied to/from
+the clipboard. Some examples:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+# Copy an image to the clipboard:
+kitten clipboard picture.png
+
+# Copy an image and some text to the clipboard:
+kitten clipboard picture.jpg text.txt
+
+# Copy text from STDIN and an image to the clipboard:
+echo hello | kitten clipboard picture.png /dev/stdin
+
+# Copy any raster image available on the clipboard to a PNG file:
+kitten clipboard \-g picture.png
+
+# Copy an image to a file and text to STDOUT:
+kitten clipboard \-g picture.png /dev/stdout
+
+# List the formats available on the system clipboard
+kitten clipboard \-g \-m . /dev/stdout
+.EE
+.UNINDENT
+.UNINDENT
+.SS Options
+.INDENT 0.0
+.TP
+.B \-\-get\-clipboard, \-g
+Output the current contents of the clipboard to STDOUT. Note that by default kitty will prompt for permission to access the clipboard. Can be controlled by \X'tty: link #opt-kitty.clipboard_control'\fI\%clipboard_control\fP\X'tty: link'\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-use\-primary, \-p
+Use the primary selection rather than the clipboard on systems that support it, such as Linux.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-mime <MIME>, \-m <MIME>
+The mimetype of the specified file. Useful when the auto\-detected mimetype is likely to be incorrect or the filename has no extension and therefore no mimetype can be detected. If more than one file is specified, this option should be specified multiple times, once for each specified file. When copying data from the clipboard, you can use wildcards to match MIME types. For example: \fB\-\-mime \(aqtext/*\(aq\fP will match any textual MIME type available on the clipboard, usually the first matching MIME type is copied. The special MIME type \fB\&.\fP will return the list of available MIME types currently on the system clipboard.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-alias <ALIAS>, \-a <ALIAS>
+Specify aliases for MIME types. Aliased MIME types are considered equivalent. When copying to clipboard both the original and alias are made available on the clipboard. When copying from clipboard if the original is not found, the alias is used, as a fallback. Can be specified multiple times to create multiple aliases. For example: \fB\-\-alias text/plain=text/x\-rst\fP makes \fBtext/plain\fP an alias of \fBtext/rst\fP\&. Aliases are not used in filter mode. An alias for \fBtext/plain\fP is automatically created if \fBtext/plain\fP is not present in the input data, but some other \fBtext/*\fP MIME is present.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-wait\-for\-completion
+Wait till the copy to clipboard is complete before exiting. Useful if running the kitten in a dedicated, ephemeral window. Only needed in filter mode.
+.UNINDENT
+.SH Author
+
+Kovid Goyal
+.SH Copyright
+
+2024, Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

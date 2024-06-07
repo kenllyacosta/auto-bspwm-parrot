@@ -1,0 +1,22 @@
+.TH "kitten-unicode-input" "1" "May 31, 2024" "0.35.1" "kitten Manual"
+.SH Name
+kitten-unicode-input \- Browse and select unicode characters by name
+.SH Usage
+.SY "kitten unicode-input "
+.YS
+.SH Description
+Input a Unicode character
+.SH Options
+.TP
+.BI "--emoji-variation" " [=none]"
+Whether to use the textual or the graphical form for emoji. By default the default form specified in the Unicode standard for the symbol is used.
+
+Choices: none, graphic, text
+.TP
+.BI "--tab" " [=previous]"
+The initial tab to display. Defaults to using the tab from the previous kitten invocation.
+
+Choices: previous, code, emoticons, favorites, name
+.TP
+.BI "--help, -h" 
+Show help for this command

@@ -1,0 +1,252 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "kitten-icat" 1 "May 31, 2024" "0.35.1" "kitty"
+.SH Name
+kitten-icat \- Display images in the terminal
+.SH Overview
+.sp
+\fIDisplay images in the terminal\fP
+.sp
+The \fBicat\fP kitten can be used to display arbitrary images in the \fIkitty\fP
+terminal. Using it is as simple as:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitten icat image.jpeg
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+It supports all image types supported by \X'tty: link https://www.imagemagick.org'\fI\%ImageMagick\fP\X'tty: link'\&. It even works over SSH. For details, see the
+\fI\%kitty graphics protocol\fP\&.
+.sp
+You might want to create an alias in your shell\(aqs configuration files:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+alias icat=\(dqkitten icat\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Then you can simply use \fBicat image.png\fP to view images.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+\X'tty: link https://www.imagemagick.org'\fI\%ImageMagick\fP\X'tty: link' must be installed for the
+full range of image types. Without it only PNG/JPG/GIF/BMP/TIFF/WEBP are
+supported.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+kitty\(aqs image display protocol may not work when used within a terminal
+multiplexer such as \fBscreen\fP or \fBtmux\fP, depending on
+whether the multiplexer has added support for it or not.
+.UNINDENT
+.UNINDENT
+.sp
+The \fBicat\fP kitten has various command line arguments to allow it to be used
+from inside other programs to display images. In particular, \fI\%\-\-place\fP,
+\fI\%\-\-detect\-support\fP and \fI\%\-\-print\-window\-size\fP\&.
+.sp
+If you are trying to integrate icat into a complex program like a file manager
+or editor, there are a few things to keep in mind. icat normally works by communicating
+over the TTY device, it both writes to and reads from the TTY. So it is
+imperative that while it is running the host program does not do any TTY I/O.
+Any key presses or other input from the user on the TTY device will be
+discarded. If you would instead like to use it just as a backend to generate
+the escape codes for image display, you need to pass it options to tell it the
+window dimensions, where to place the image in the window and the transfer mode
+to use. If you do that, it will not try to communicate with the TTY device at
+all. The requisite options are: \fI\%\-\-use\-window\-size\fP, \fI\%\-\-place\fP
+and \fI\%\-\-transfer\-mode\fP, \fI\%\-\-stdin=no\fP\&.
+For example, to demonstrate usage without access to the TTY:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+zsh \-c \(aqsetsid kitten icat \-\-stdin=no \-\-use\-window\-size $COLUMNS,$LINES,3000,2000 \-\-transfer\-mode=file myimage.png\(aq
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Here, \fBsetsid\fP ensures icat has no access to the TTY device.
+The values, 3000, 2000 are made up. They are the window width and height in
+pixels, to obtain which access to the TTY is needed.
+.sp
+To be really robust you should consider writing proper support for the
+\fI\%kitty graphics protocol\fP in the program instead.
+Nowadays there are many libraries that have support for it.
+.SH Source code for icat
+.sp
+The source code for this kitten is \X'tty: link https://github.com/kovidgoyal/kitty/tree/master/kittens/icat'\fI\%available on GitHub\fP\X'tty: link'\&.
+.SH Command line interface
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.EX
+kitty +kitten icat [options] image\-file\-or\-url\-or\-directory ...
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+A cat like utility to display images in the terminal. You can specify multiple image files and/or directories. Directories are scanned recursively for image files. If STDIN is not a terminal, image data will be read from it as well. You can also specify HTTP(S) or FTP URLs which will be automatically downloaded and displayed.
+.SS Options
+.INDENT 0.0
+.TP
+.B \-\-align <ALIGN>
+Horizontal alignment for the displayed image.
+Default: \fBcenter\fP
+Choices: \fBcenter\fP, \fBleft\fP, \fBright\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-place <PLACE>
+Choose where on the screen to display the image. The image will be scaled to fit into the specified rectangle. The syntax for specifying rectangles is <width>x<height>@<left>x<top>. All measurements are in cells (i.e. cursor positions) with the origin (0, 0) at the top\-left corner of the screen. Note that the \fI\%\-\-align\fP option will horizontally align the image within this rectangle. By default, the image is horizontally centered within the rectangle. Using place will cause the cursor to be positioned at the top left corner of the image, instead of on the line after the image.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-scale\-up
+When used in combination with \fI\%\-\-place\fP it will cause images that are smaller than the specified area to be scaled up to use as much of the specified area as possible.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-background <BACKGROUND>
+Specify a background color, this will cause transparent images to be composited on top of the specified color.
+Default: \fBnone\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-mirror <MIRROR>
+Mirror the image about a horizontal or vertical axis or both.
+Default: \fBnone\fP
+Choices: \fBboth\fP, \fBhorizontal\fP, \fBnone\fP, \fBvertical\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-clear
+Remove all images currently displayed on the screen.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-transfer\-mode <TRANSFER_MODE>
+Which mechanism to use to transfer images to the terminal. The default is to auto\-detect. file means to use a temporary file, memory means to use shared memory, stream means to send the data via terminal escape codes. Note that if you use the file or memory transfer modes and you are connecting over a remote session then image display will not work.
+Default: \fBdetect\fP
+Choices: \fBdetect\fP, \fBfile\fP, \fBmemory\fP, \fBstream\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-detect\-support
+Detect support for image display in the terminal. If not supported, will exit with exit code 1, otherwise will exit with code 0 and print the supported transfer mode to stderr, which can be used with the \fI\%\-\-transfer\-mode\fP option.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-detection\-timeout <DETECTION_TIMEOUT>
+The amount of time (in seconds) to wait for a response from the terminal, when detecting image display support.
+Default: \fB10\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-use\-window\-size <USE_WINDOW_SIZE>
+Instead of querying the terminal for the window size, use the specified size, which must be of the format: width_in_cells,height_in_cells,width_in_pixels,height_in_pixels
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-print\-window\-size
+Print out the window size as <width>x<height> (in pixels) and quit. This is a convenience method to query the window size if using \fBkitten icat\fP from a scripting language that cannot make termios calls.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-stdin <STDIN>
+Read image data from STDIN. The default is to do it automatically, when STDIN is not a terminal, but you can turn it off or on explicitly, if needed.
+Default: \fBdetect\fP
+Choices: \fBdetect\fP, \fBno\fP, \fByes\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-silent
+Not used, present for legacy compatibility.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-engine <ENGINE>
+The engine used for decoding and processing of images. The default is to use the most appropriate engine.  The \fBbuiltin\fP engine uses Go\(aqs native imaging libraries. The \fBmagick\fP engine uses ImageMagick which requires it to be installed on the system.
+Default: \fBauto\fP
+Choices: \fBauto\fP, \fBbuiltin\fP, \fBmagick\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-z\-index <Z_INDEX>, \-z <Z_INDEX>
+Z\-index of the image. When negative, text will be displayed on top of the image. Use a double minus for values under the threshold for drawing images under cell background colors. For example, \fB\-\-1\fP evaluates as \-1,073,741,825.
+Default: \fB0\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-loop <LOOP>, \-l <LOOP>
+Number of times to loop animations. Negative values loop forever. Zero means only the first frame of the animation is displayed. Otherwise, the animation is looped the specified number of times.
+Default: \fB\-1\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-hold
+Wait for a key press before exiting after displaying the images.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-unicode\-placeholder
+Use the Unicode placeholder method to display the images. Useful to display images from within full screen terminal programs that do not understand the kitty graphics protocol such as multiplexers or editors. See \X'tty: link #graphics-unicode-placeholders'\fI\%Unicode placeholders\fP\X'tty: link' for details. Note that when using this method, placed (with \fI\%\-\-place\fP) images that do not fit on the screen, will get wrapped at the screen edge instead of getting truncated. This wrapping is per line and therefore the image will look like it is interleaved with blank lines.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-passthrough <PASSTHROUGH>
+Whether to surround graphics commands with escape sequences that allow them to passthrough programs like tmux. The default is to detect when running inside tmux and automatically use the tmux passthrough escape codes. Note that when this option is enabled it implies \fI\%\-\-unicode\-placeholder\fP as well.
+Default: \fBdetect\fP
+Choices: \fBdetect\fP, \fBnone\fP, \fBtmux\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-image\-id <IMAGE_ID>
+The graphics protocol id to use for the created image. Normally, a random id is created if needed. This option allows control of the id. When multiple images are sent, sequential ids starting from the specified id are used. Valid ids are from 1 to 4294967295. Numbers outside this range are automatically wrapped.
+Default: \fB0\fP
+.UNINDENT
+.SH Author
+
+Kovid Goyal
+.SH Copyright
+
+2024, Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

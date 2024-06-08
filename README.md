@@ -16,7 +16,7 @@ El script realiza las siguientes acciones:
 ### Instalaciones
 - kitty v0.35.1
 - Neovim v0.10.0
-- Visual Studio Code v1.89.1
+- Visual Studio Code v1.90.0
 - bspwm v0.9.10
 - sxhkd v0.6.2
 - polybar 3.7.1-11

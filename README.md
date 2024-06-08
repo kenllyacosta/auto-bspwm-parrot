@@ -212,9 +212,31 @@ sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/.pow
 mkdir -p ~/.config/rofi/themes
 cp $ruta/rofi/nord.rasi ~/.config/rofi/themes/
 
+echo -e "\n\n${blueColour}[*] Instalando LSD.\n${endColour}"
+sleep 2
 # Instando lsd
 sudo dpkg -i $ruta/lsd.deb
 sleep 2
+if [ $? != 0 ] && [ $? != 130 ]; then
+	echo -e "\n${redColour}[-] Falló la instalación de lsd.\n${endColour}"
+	sleep 3
+else
+	echo -e "\n${greenColour}[+] Done\n${endColour}"
+	sleep 1.5
+fi
+
+echo -e "\n\n${blueColour}[*] Instalando bat.\n${endColour}"
+sleep 2
+# Instando lsd
+sudo dpkg -i $ruta/bat.deb
+sleep 2
+if [ $? != 0 ] && [ $? != 130 ]; then
+	echo -e "\n${redColour}[-] Falló la instalación de bat.\n${endColour}"
+	sleep 3
+else
+	echo -e "\n${greenColour}[+] Done\n${endColour}"
+	sleep 1.5
+fi
 
 echo -e "\n\n${blueColour}[*] Instalando Visual Studio Code.\n${endColour}"
 sleep 2

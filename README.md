@@ -21,6 +21,7 @@ El script realiza las siguientes acciones:
 - sxhkd v0.6.2
 - polybar 3.7.1-11
 - python2 v2.7.18
+- python3 v3.11.2
 - pip2 20.3.4
 - Picom vgit-c4107
 - zsh
@@ -30,6 +31,7 @@ El script realiza las siguientes acciones:
 - seclists
 - powerlevel10k
 - pwntools
+- i3lock-fancy
 
 ### Requisitos
 - Parrot OS

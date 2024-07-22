@@ -94,6 +94,7 @@ cd ~/github
 git clone --recursive https://github.com/polybar/polybar
 git clone https://github.com/ibhagwan/picom.git
 git clone https://github.com/NvChad/starter ~/.config/nvim
+git clone https://github.com/meskarune/i3lock-fancy.git
 sudo mkdir /root/.config/nvim
 sudo git clone https://github.com/NvChad/starter /root/.config/nvim
 wget https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz
@@ -109,6 +110,10 @@ cd ~/github
 tar -xf nvim-linux64.tar.gz
 rm nvim-linux64.tar.gz
 sudo cp -rv nvim-linux64 /opt/nvim/
+
+# Instalamos i3lock-fancy
+cd ~/github/i3lock-fancy
+sudo make install
 
 # Instalando Polybar
 cd ~/github/polybar
@@ -281,7 +286,13 @@ fi
 
 # Actualizando la base de datos de locate
 sudo updatedb
-sudo umount /run/user/1000/gvfs /run/user/1000/doc
+sudo umount /run/user/1000/gvfs 
+sudo umount /run/user/1000/doc
+
+# Actualizando de los paquetes instalados
+sudo apt update
+sudo parrot-upgrade
+
 sudo apt autoremove -y
 
 # Mensaje de instalación completada

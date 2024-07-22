@@ -136,6 +136,10 @@ super + shift + f
 super + shift + b
 	burpsuite
 
+# i3lock-fancy
+super + shift + l
+	/usr/bin/i3lock-fancy
+
 ###############
 # ScreenShots #
 ###############

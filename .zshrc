@@ -21,6 +21,7 @@ bindkey -e
 HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zsh_history
+setopt histignorealldups sharehistory
 
 # Use modern completion system
 autoload -Uz compinit
@@ -146,6 +147,10 @@ cleanDocker(){
     docker rmi $(docker images -q) 2>/dev/null
     docker network rm $(docker network ls -q) 2>/dev/null
     docker volume rm $(docker volume ls -q) 2>/dev/null
+}
+
+clearhistory(){
+	echo '' > ~/.zsh_history
 }
 
 # Finalize Powerlevel10k instant prompt. Should stay at the bottom of ~/.zshrc.

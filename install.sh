@@ -77,7 +77,7 @@ fi
 echo -e "\n\n${blueColour}[*] Instalando paquetes adicionales.\n${endColour}"
 sleep 2
 # Instalamos paquetes adionales
-sudo apt install -y feh scrot scrub zsh rofi xclip bat locate neofetch wmname acpi bspwm sxhkd imagemagick ranger kitty seclists
+sudo apt install -y feh scrot scrub zsh rofi xclip bat locate neofetch wmname acpi bspwm sxhkd imagemagick ranger kitty seclists fzf
 if [ $? != 0 ] && [ $? != 130 ]; then
 	echo -e "\n${redColour}[-] Falló la instalación de paquetes adicionales.\n${endColour}"
 	exit 1

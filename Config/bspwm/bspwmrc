@@ -38,3 +38,5 @@ picom &
 bspc config border_width 1
 
 xsetroot -cursor_name left_ptr &
+
+numlockx on &

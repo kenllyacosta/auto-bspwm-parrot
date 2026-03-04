@@ -27,6 +27,8 @@ ruta=$(pwd)
 echo -e "\n\n${blueColour}[*] Actualizando el sistema, por favor espere...\n${endColour}"
 sleep 2
 
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7A8286AF0E81EE4A
+
 # Actualizando el sistema
 sudo apt update
 sudo parrot-upgrade

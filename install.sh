@@ -190,29 +190,7 @@ if [[ -n $LOCK_FILE ]]; then
     mkdir -p "$(dirname "$lazy_dir")"
     mv "$TMP/lazy.nvim" "$lazy_dir"
 fi
-for config in bspwm sxhkd polybar picom kitty; do
-    backup ".config/$config"
-    rm -rf -- "$HOME/.config/$config"
-    cp -a "$ROOT/Config/$config" "$HOME/.config/$config"
-done
-backup .config/bin
-mkdir -p "$HOME/.config/bin"
-cp "$ROOT"/Config/bin/*.sh "$HOME/.config/bin/"
-backup .config/rofi
-mkdir -p "$HOME/.config/rofi/themes"
-cp "$ROOT/rofi/nord.rasi" "$HOME/.config/rofi/themes/"
-printf '@theme "themes/nord.rasi"\n' > "$HOME/.config/rofi/config.rasi"
-for config in .zshrc .p10k.zsh; do backup "$config"; cp "$ROOT/$config" "$HOME/$config"; done
-for script in screenshot whichSystem.py; do
-    backup ".local/bin/$script"
-    install -m 755 "$ROOT/scripts/$script" "$HOME/.local/bin/$script"
-done
-if ! command -v bat >/dev/null && command -v batcat >/dev/null; then
-    backup .local/bin/bat
-    ln -sfn /usr/bin/batcat "$HOME/.local/bin/bat"
-fi
-chmod +x "$HOME/.config/bspwm/bspwmrc" "$HOME/.config/bspwm/scripts/"* \
-    "$HOME/.config/bin/"*.sh "$HOME/.config/polybar/launch.sh" "$HOME/.config/polybar/scripts/"{launcher,powermenu,powermenu_alt}
+BSPWM_CONFIG_BACKUP="$BACKUP" bash "$ROOT/scripts/apply-config.sh"
 if [[ -n $LOCK_FILE ]]; then
     python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" python > "$TMP/constraints.txt"
     PIP_CONSTRAINT="$TMP/constraints.txt" pipx install --force pwntools

@@ -138,6 +138,20 @@ Protocolo y estado real de las pruebas: [validación en VMware](docs/vm-validati
 
 ## Validación
 
+Si la instalación se interrumpió y los atajos o botones conservan rutas antiguas,
+puedes reparar la configuración sin reinstalar paquetes:
+
+```bash
+bash scripts/apply-config.sh
+```
+
+Ejecuta como tu usuario habitual. Guarda un respaldo antes de sustituir la
+configuración; después cierra sesión y selecciona **bspwm (X11)**.
+
+En una VM VMware amd64, actualiza el núcleo, Mesa y la integración del invitado
+con `bash scripts/update-vmware-drivers.sh`. Usa las versiones candidatas de los
+repositorios configurados, conserva sus prioridades y no reinicia automáticamente.
+
 ```bash
 bash -n install.sh
 python3 -m unittest discover -s tests -v

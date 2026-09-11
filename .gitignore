@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+/kitty/
+/fonts/HNF/
+/Config/polybar/fonts/
+/*.deb
+/validation-results/
+/.vm-access/

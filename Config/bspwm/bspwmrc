@@ -1,42 +1,35 @@
-#! /bin/sh
-
-wmname LG3D &
-vmware-user-suid-wrapper &
-
-pgrep -x sxhkd > /dev/null || sxhkd &
-
+#!/bin/sh
+export PATH="$HOME/.local/bin:$PATH"
+export _JAVA_AWT_WM_NONREPARENTING=1
+start_once() {
+    command -v "$1" >/dev/null 2>&1 || return 0
+    pgrep -u "$(id -u)" -x "$1" >/dev/null || "$@" &
+}
+start_once sxhkd
+start_once dunst
+start_once nm-applet
+start_once vmware-user-suid-wrapper
+start_once xss-lock --transfer-sleep-lock -- i3lock --nofork --color=2e3440
+start_once lxpolkit
+wmname LG3D
 bspc monitor -d I II III IV V VI VII VIII IX X
-
-bspc config border_width         2
-bspc config window_gap          12
-
-bspc config split_ratio          0.52
-bspc config borderless_monocle   true
-bspc config gapless_monocle      true
-
+bspc config border_width 1
+bspc config window_gap 12
+bspc config split_ratio 0.52
+bspc config borderless_monocle true
+bspc config gapless_monocle true
+bspc config focus_follows_pointer true
 bspc rule -a Gimp desktop='^8' state=floating follow=on
 bspc rule -a Chromium desktop='^2'
-bspc rule -a mplayer2 state=floating
-bspc rule -a Kupfer.py focus=on
 bspc rule -a Screenkey manage=off
-
-# RESOLUCION ARANDR
-
-
-# WALLPAPER
-vmware-user-suid-wrapper &
-/usr/bin/feh --bg-fill /usr/share/backgrounds/default.jpg &
-
-# POLYBAR
-~/.config/polybar/launch.sh
-
-# CUSTOM
-bspc config focus_follows_pointer true
-
-# PICOM
-picom &
-bspc config border_width 1
-
-xsetroot -cursor_name left_ptr &
-
-numlockx on &
+if [ -f "$HOME/.fehbg" ]; then
+    sh "$HOME/.fehbg"
+elif [ -f /usr/share/backgrounds/default.jpg ]; then
+    feh --bg-fill /usr/share/backgrounds/default.jpg
+else
+    xsetroot -solid '#2e3440'
+fi
+"$HOME/.config/polybar/launch.sh"
+start_once picom
+xsetroot -cursor_name left_ptr
+numlockx on

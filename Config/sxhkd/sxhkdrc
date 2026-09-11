@@ -4,7 +4,7 @@
 
 # terminal emulator
 super + Return
-	/opt/kitty/bin/kitty
+	kitty
 
 # program launcher
 super + d
@@ -138,7 +138,7 @@ super + shift + b
 
 # i3lock-fancy
 super + shift + l
-	/usr/bin/i3lock-fancy
+	i3lock --color=2e3440
 
 ###############
 # ScreenShots #
@@ -147,8 +147,8 @@ super + shift + l
 @Print
         screenshot select
 
-@Print + ctrl
+ctrl + @Print
         screenshot
 
-@Print + alt
+alt + @Print
         screenshot window

@@ -1,13 +1,8 @@
 #!/bin/sh
-
-ip_target=$(cat ~/.config/bin/target | awk '{print $1}')
-name_target=$(cat ~/.config/bin/target | awk '{print $2}')
-
-if [ $ip_target ] && [ $name_target ]; then
-	echo "%{F#e51d0b}什%{F#ffffff} $ip_target - $name_target"
-elif [ $(cat ~/.config/bin/target | wc -w) -eq 1 ]; then
-	echo "%{F#e51d0b}什%{F#ffffff} $ip_target"
+target="$HOME/.config/bin/target"
+if [ -s "$target" ]; then
+    # Remove Polybar formatting/action delimiters from user-supplied content.
+    printf 'TARGET %s\n' "$(head -n 1 "$target" | tr -d '%{}')"
 else
-	echo "%{F#e51d0b}ﲅ %{u-}%{F#ffffff} No target"
+    printf 'No target\n'
 fi
-

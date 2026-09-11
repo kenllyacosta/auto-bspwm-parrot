@@ -1,316 +1,237 @@
-#!/bin/bash
-
-# Colours
-greenColour="\e[0;32m\033[1m"
-redColour="\e[0;31m\033[1m"
-blueColour="\e[0;34m\033[1m"
-endColour="\033[0m\e[0m"
-
-if [ "$(whoami)" == "root" ]; then
-    exit 1
-fi
-
-trap ctrl_c INT
-
-function ctrl_c(){
-	echo -e "\n\n${redColour}[!] Saliendo...\n${endColour}"
-	exit 1
-}
-
-# Comentamos la primera línea de este archivo /etc/apt/sources.list para evitar errores de actualización
-if [ $(wc -l < /etc/apt/sources.list) -eq 2 ]; then
-    sudo sed -i '1s/^/#/' /etc/apt/sources.list
-fi
-
-ruta=$(pwd)
-
-echo -e "\n\n${blueColour}[*] Actualizando el sistema, por favor espere...\n${endColour}"
-sleep 2
-
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7A8286AF0E81EE4A
-
-# Actualizando el sistema
-sudo apt update
-sudo parrot-upgrade
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la actualización del sistema.\n${endColour}"
-	exit 1
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando dependencias.\n${endColour}"
-sleep 2
-# Instalando dependencias del Entorno
-sudo apt install -y build-essential git vim xcb libxcb-util0-dev libxcb-ewmh-dev libxcb-randr0-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-xinerama0-dev libasound2-dev libxcb-xtest0-dev libxcb-shape0-dev
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de dependencias del entorno.\n${endColour}"
-	exit 1
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando dependencias de la Polybar.\n${endColour}"
-sleep 2
-# Instalando requerimientos para la Polybar
-sudo apt install -y cmake cmake-data pkg-config python3-sphinx libcairo2-dev libxcb1-dev libxcb-util0-dev libxcb-randr0-dev libxcb-composite0-dev python3-xcbgen xcb-proto libxcb-image0-dev libxcb-ewmh-dev libxcb-icccm4-dev libxcb-xkb-dev libxcb-xrm-dev libxcb-cursor-dev libasound2-dev libpulse-dev libjsoncpp-dev libmpdclient-dev libuv1-dev libnl-genl-3-dev
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de dependencias de la Polybar.\n${endColour}"
-	exit 1
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando dependencias de Picom.\n${endColour}"
-sleep 2
-# Dependencias de Picom
-sudo apt install -y meson libxext-dev libxcb1-dev libxcb-damage0-dev libxcb-xfixes0-dev libxcb-shape0-dev libxcb-render-util0-dev libxcb-render0-dev libxcb-composite0-dev libxcb-image0-dev libxcb-present-dev libxcb-xinerama0-dev libpixman-1-dev libdbus-1-dev libconfig-dev libgl1-mesa-dev libpcre2-dev libevdev-dev uthash-dev libev-dev libx11-xcb-dev libxcb-glx0-dev libpcre3 libpcre3-dev
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de dependencias de Picom.\n${endColour}"
-	exit 1
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando paquetes adicionales.\n${endColour}"
-sleep 2
-# Instalamos paquetes adionales
-sudo apt install -y feh scrot scrub zsh rofi xclip bat locate neofetch wmname acpi bspwm sxhkd imagemagick ranger kitty seclists fzf numlockx
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de paquetes adicionales.\n${endColour}"
-	exit 1
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-# Creando carpeta de Reposistorios
-mkdir ~/github
-
-# Descargar Repositorios Necesarios
-cd ~/github
-git clone --recursive https://github.com/polybar/polybar
-git clone https://github.com/ibhagwan/picom.git
-git clone https://github.com/NvChad/starter ~/.config/nvim
-git clone https://github.com/meskarune/i3lock-fancy.git
-sudo mkdir /root/.config/nvim
-sudo git clone https://github.com/NvChad/starter /root/.config/nvim
-wget https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz
-
-# Desinstalamos las apps que no necesitamos
-sudo apt remove -y neovim
-sudo apt remove -y kitty 
-
-echo -e "\n\n${blueColour}[*] Instalando nvim y otras apps...\n${endColour}"
-sleep 2
-# Instalamos Neovim
-cd ~/github
-tar -xf nvim-linux64.tar.gz
-rm nvim-linux64.tar.gz
-sudo cp -rv nvim-linux64 /opt/nvim/
-
-# Instalamos i3lock-fancy
-cd ~/github/i3lock-fancy
-sudo make install
-
-# Instalando Polybar
-cd ~/github/polybar
-mkdir build
-cd build
-cmake ..
-make -j$(nproc)
-sudo make install
-
-# Instalando Picom
-cd ~/github/picom
-git submodule update --init --recursive
-meson --buildtype=release . build
-ninja -C build
-sudo ninja -C build install
-
-# Instalando p10k
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
-echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
-
-# Instalando p10k root
-sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/.powerlevel10k
-
-# Configuramos el tema Nord de Rofi:
-mkdir -p ~/.config/rofi/themes
-cp $ruta/rofi/nord.rasi ~/.config/rofi/themes/
-
-echo -e "\n\n${blueColour}[*] Instalando LSD.\n${endColour}"
-sleep 2
-# Instando lsd
-sudo dpkg -i $ruta/lsd.deb
-sleep 2
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de lsd.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando bat.\n${endColour}"
-sleep 2
-# Instando lsd
-sudo dpkg -i $ruta/bat.deb
-sleep 2
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de bat.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando Visual Studio Code.\n${endColour}"
-sleep 2
-# Instalando Visual Studio Code
-sudo dpkg -i $ruta/vscode.deb
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de Visual Studio Code.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando Python2.7.18.\n${endColour}"
-sleep 2
-# Instalamos python2.7.18
-cd $ruta/
-wget https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-tar xzf Python-2.7.18.tgz
-cd $ruta/Python-2.7.18/
-./configure --enable-optimizations
-sudo make install
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de Python2.7.18.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando pip2.\n${endColour}"
-sleep 2
-# Instalando pip2
-curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
-sudo python2 get-pip.py
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de pip2.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-echo -e "\n\n${blueColour}[*] Instalando paquetes de python.\n${endColour}"
-# Instalando paquetes de Python
-sudo pip3 install pwntools --break-system-packages
-sudo pip2 install pwntools
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la instalación de pwntools.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-# Instalamos las HackNerdFonts
-sudo cp -v $ruta/fonts/HNF/* /usr/local/share/fonts/
-
-# Instalando Fuentes de Polybar
-sudo cp -v $ruta/Config/polybar/fonts/* /usr/share/fonts/truetype/
-
-# Copiando Archivos de Configuración
-cp -rv $ruta/Config/* ~/.config/
-sudo cp -rv $ruta/Config/* /root/.config/
-sudo cp -rv $ruta/kitty /opt/
-
-# Kitty Root
-sudo cp -rv $ruta/Config/kitty /root/.config/
-
-# Copia de configuracion de .p10k.zsh y .zshrc
-rm -rf ~/.zshrc
-cp -v $ruta/.zshrc ~/.zshrc
-
-cp -v $ruta/.p10k.zsh ~/.p10k.zsh
-sudo cp -v $ruta/.p10k.zsh-root /root/.p10k.zsh
-
-# Script
-sudo cp -v $ruta/scripts/whichSystem.py /usr/local/bin/
-sudo cp -v $ruta/scripts/screenshot /usr/local/bin/
-
-# Plugins ZSH
-sudo apt install -y zsh-syntax-highlighting zsh-autosuggestions zsh-autocomplete
-sudo mkdir /usr/share/zsh-sudo
-cd /usr/share/zsh-sudo
-sudo wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh
-
-# Cambiando de SHELL a zsh
-chsh -s /usr/bin/zsh
-sudo usermod --shell /usr/bin/zsh root
-sudo ln -s -fv ~/.zshrc /root/.zshrc
-
-# Asignamos Permisos a los Scritps
-chmod +x ~/.config/bspwm/bspwmrc
-chmod +x ~/.config/bspwm/scripts/bspwm_resize
-chmod +x ~/.config/bin/ethernet_status.sh
-chmod +x ~/.config/bin/htb_status.sh
-chmod +x ~/.config/bin/htb_target.sh
-chmod +x ~/.config/polybar/launch.sh
-sudo chmod +x /usr/local/bin/whichSystem.py
-sudo chmod +x /usr/local/bin/screenshot
-
-# Configuramos el Tema de Rofi
-rofi-theme-selector
-sleep 3
-
-echo -e "\n\n${blueColour}[*] Limpiando archivos temporales usados...\n${endColour}"
-sleep 2
-# Removiendo Repositorio
-sudo rm -rf ~/github
-sudo rm -rf $ruta
-if [ $? != 0 ] && [ $? != 130 ]; then
-	echo -e "\n${redColour}[-] Falló la limpieza de archivos temporales.\n${endColour}"
-	sleep 3
-else
-	echo -e "\n${greenColour}[+] Done\n${endColour}"
-	sleep 1.5
-fi
-
-# Actualizando la base de datos de locate
-sudo updatedb
-sudo umount /run/user/1000/gvfs 
-sudo umount /run/user/1000/doc
-
-# Actualizando de los paquetes instalados
-sudo apt update
-sudo parrot-upgrade
-
-sudo apt autoremove -y
-
-# Mensaje de instalación completada
-notify-send "BSPWM INSTALADO"
-
-while true; do
-	echo -en "\n${yellowColour}[?] Instalación completada, es necesario reiniciar el sistema. ¿Deseas reiniciar ahora? ([y]/n) ${endColour}"
-	read -r
-	REPLY=${REPLY:-"y"}
-	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		echo -e "\n\n${greenColour}[+] Restarting the system...\n${endColor}"
-		sleep 1
-		sudo reboot
-	elif [[ $REPLY =~ ^[Nn]$ ]]; then
-		exit 0
-	else
-		echo -e "\n${redColour}[!] Invalid response, please try again\n${endColour}"
-	fi
+#!/usr/bin/env bash
+set -Eeuo pipefail
+umask 022
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+MODE=latest
+UPGRADE=false
+CHANGE_SHELL=false
+LOCK_FILE=
+while (( $# )); do
+    arg=$1
+    case "$arg" in
+        --locked) (( $# >= 2 )) || { printf 'Falta el archivo de versiones\n' >&2; exit 2; }; LOCK_FILE=$(realpath -- "$2"); shift ;;
+        --repo-only) MODE=repo ;;
+        --upgrade-system) UPGRADE=true ;;
+        --change-shell) CHANGE_SHELL=true ;;
+        --help|-h) printf 'Uso: bash install.sh [--repo-only] [--upgrade-system] [--change-shell] [--locked ARCHIVO]\n'; exit 0 ;;
+        *) printf 'Opción desconocida: %s\n' "$arg" >&2; exit 2 ;;
+    esac
+    shift
 done
+die() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
+[[ $(uname -s) == Linux ]] || die 'Ejecuta este instalador en Linux.'
+(( EUID != 0 )) || die 'Ejecuta como usuario normal con acceso a sudo.'
+# shellcheck disable=SC1091
+source /etc/os-release
+case "$ID" in
+    parrot) [[ ${VERSION_ID%%.*} == 7 ]] || die 'Se requiere Parrot 7.x.' ;;
+    kali) ;;
+    *) die 'Distribución compatible: Parrot 7.x o Kali Linux.' ;;
+esac
+ARCH=$(dpkg --print-architecture)
+case "$ARCH" in
+    amd64) NVARCH=x86_64; KITARCH=x86_64; CODEARCH=x64 ;;
+    arm64) NVARCH=arm64; KITARCH=arm64; CODEARCH=arm64 ;;
+    *) die 'Arquitectura compatible: amd64 o arm64.' ;;
+esac
+if [[ -n $LOCK_FILE ]]; then
+    "$UPGRADE" && die '--locked no permite actualizar el sistema.'
+    command -v python3 >/dev/null || die 'El modo fijo requiere Python 3 instalado.'
+    python3 "$ROOT/scripts/pins.py" check "$LOCK_FILE" "$ID" "${VERSION_ID:-rolling}" "$ARCH"
+    MODE=$(python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" mode)
+    export BSPWM_LOCK_FILE="$LOCK_FILE"
+else
+    unset BSPWM_LOCK_FILE
+fi
+[[ ${XDG_CONFIG_HOME:-$HOME/.config} == "$HOME/.config" ]] || die 'Se requiere XDG_CONFIG_HOME=$HOME/.config.'
+command -v sudo >/dev/null || die 'Instala sudo y autoriza a tu usuario primero.'
+sudo -v
+STATE="$HOME/.local/state/auto-bspwm"
+mkdir -p "$STATE"
+exec 9>"$STATE/install.lock"
+flock -n 9 || die 'Ya hay una instalación en curso.'
+RUN=$(date +%Y%m%d-%H%M%S)-$$
+BACKUP="$STATE/backups/$RUN"
+RUN_DIR="$STATE/runs/$RUN"
+mkdir -p "$BACKUP" "$RUN_DIR"
+LOG="$STATE/install-$RUN.log"
+exec > >(tee -a "$LOG") 2>&1
+TMP=$(mktemp -d)
+trap 'rm -rf -- "$TMP"' EXIT
+trap 'exit 130' INT
+trap 'printf "Error en línea %s. Registro: %s; respaldo: %s\n" "$LINENO" "$LOG" "$BACKUP" >&2' ERR
+backup() {
+    local path=$1
+    if [[ -e "$HOME/$path" || -L "$HOME/$path" ]]; then
+        mkdir -p "$BACKUP/$(dirname "$path")"
+        cp -a -- "$HOME/$path" "$BACKUP/$path"
+    fi
+}
+release() {
+    python3 "$ROOT/scripts/release.py" "$1" "$2" "$3" | tee -a "$RUN_DIR/artifacts.jsonl"
+}
+clone_repo() {
+    local name=$1 url=$2 destination=$3 commit
+    if [[ -n $LOCK_FILE ]]; then
+        commit=$(python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" "$name")
+        git init "$destination"
+        git -C "$destination" remote add origin "$url"
+        git -C "$destination" fetch --depth=1 origin "$commit"
+        git -C "$destination" checkout --detach FETCH_HEAD
+        [[ $(git -C "$destination" rev-parse HEAD) == "$commit" ]] || die 'Commit diferente al lock'
+    else
+        git clone --depth=1 "$url" "$destination"
+    fi
+    git -C "$destination" rev-parse HEAD > "$RUN_DIR/$name.txt"
+}
+printf 'Instalando en %s (%s), modo %s. Registro: %s\n' "$PRETTY_NAME" "$ARCH" "$MODE" "$LOG"
+find /usr/share/xsessions /usr/share/wayland-sessions -maxdepth 1 -name '*.desktop' \
+    -print 2>/dev/null > "$RUN_DIR/sessions-before.txt" || true
+[[ -s "$RUN_DIR/sessions-before.txt" ]] || die 'Se requiere un escritorio original para recuperación.'
+readlink -f /etc/systemd/system/display-manager.service > "$RUN_DIR/display-manager.txt" || true
+sudo apt-get update
+if "$UPGRADE"; then
+    sudo apt-get --no-remove full-upgrade -y
+fi
+PACKAGES=(bspwm sxhkd polybar picom xserver-xorg xinit dbus-x11 \
+    x11-xserver-utils x11-utils xauth curl ca-certificates git python3 python3-venv \
+    python3-pip pipx build-essential pkg-config libssl-dev libffi-dev \
+    unzip xz-utils fontconfig fonts-dejavu-core feh scrot zsh rofi xclip \
+    plocate fastfetch wmname acpi fzf ripgrep numlockx iproute2 iputils-ping scrub \
+    libnotify-bin dunst i3lock xss-lock network-manager-gnome lxpolkit \
+    zsh-syntax-highlighting zsh-autosuggestions ranger file firefox-esr pavucontrol kitty-terminfo \
+    libgl1 libegl1 libxkbcommon-x11-0 libfontconfig1)
+if [[ -n $LOCK_FILE ]]; then
+    python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" apt > "$TMP/apt.txt"
+    mapfile -t PACKAGES < "$TMP/apt.txt"
+fi
+# Abort dependency resolution instead of removing the original desktop or login manager.
+sudo apt-get --no-remove install -y "${PACKAGES[@]}"
+python3 -c 'import json,sys; print(json.dumps(dict(zip(("id","version","arch","mode"), sys.argv[1:]))))' \
+    "$ID" "${VERSION_ID:-rolling}" "$ARCH" "$MODE" > "$RUN_DIR/platform.json"
+python3 "$ROOT/scripts/pins.py" fingerprint > "$RUN_DIR/source.sha256"
+mkdir -p "$HOME/.local/bin" "$HOME/.local/opt" "$HOME/.local/share/fonts/auto-bspwm"
+export PATH="$HOME/.local/bin:$PATH"
+if [[ $MODE == latest ]]; then
+    release neovim/neovim "nvim-linux-$NVARCH.tar.gz" "$TMP/nvim.tar.gz"
+    tar -xzf "$TMP/nvim.tar.gz" -C "$TMP"
+    backup .local/opt/nvim
+    rm -rf -- "$HOME/.local/opt/nvim"
+    mv "$TMP/nvim-linux-$NVARCH" "$HOME/.local/opt/nvim"
+    release kovidgoyal/kitty "kitty-*-$KITARCH.txz" "$TMP/kitty.txz"
+    mkdir "$TMP/kitty"
+    tar -xJf "$TMP/kitty.txz" -C "$TMP/kitty"
+    backup .local/opt/kitty
+    rm -rf -- "$HOME/.local/opt/kitty"
+    mv "$TMP/kitty" "$HOME/.local/opt/kitty"
+    for app in nvim kitty; do
+        backup ".local/bin/$app"
+        ln -sfn "$HOME/.local/opt/$app/bin/$app" "$HOME/.local/bin/$app"
+    done
+    backup .local/bin/kitten
+    ln -sfn "$HOME/.local/opt/kitty/bin/kitten" "$HOME/.local/bin/kitten"
+    backup .local/share/applications/kitty.desktop
+    mkdir -p "$HOME/.local/share/applications"
+    cat > "$HOME/.local/share/applications/kitty.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Kitty
+Exec="$HOME/.local/bin/kitty"
+Icon=$HOME/.local/opt/kitty/share/icons/hicolor/256x256/apps/kitty.png
+Terminal=false
+Categories=System;TerminalEmulator;
+EOF
+    release sharkdp/bat "bat_*_${ARCH}.deb" "$TMP/bat.deb"
+    release lsd-rs/lsd "lsd_*_${ARCH}.deb" "$TMP/lsd.deb"
+    release --vscode "https://update.code.visualstudio.com/latest/linux-deb-$CODEARCH/stable" "$TMP/code.deb"
+    chmod 755 "$TMP"
+    printf 'code code/add-microsoft-repo boolean false\n' | sudo debconf-set-selections
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get --no-remove install -y "$TMP/bat.deb" "$TMP/lsd.deb" "$TMP/code.deb"
+else
+    if [[ -z $LOCK_FILE ]]; then sudo apt-get --no-remove install -y neovim kitty bat lsd; fi
+    for app in nvim kitty kitten; do
+        if [[ -L "$HOME/.local/bin/$app" && $(readlink "$HOME/.local/bin/$app") == "$HOME/.local/opt/"* ]]; then
+            backup ".local/bin/$app"
+            rm -- "$HOME/.local/bin/$app"
+        fi
+    done
+    if [[ -f "$HOME/.local/share/applications/kitty.desktop" ]] &&
+        grep -Fq "$HOME/.local/bin/kitty" "$HOME/.local/share/applications/kitty.desktop"; then
+        backup .local/share/applications/kitty.desktop
+        rm -- "$HOME/.local/share/applications/kitty.desktop"
+    fi
+fi
+for family in Hack Iosevka Hurmit; do
+    release ryanoasis/nerd-fonts "$family.zip" "$TMP/$family.zip"
+    mkdir "$TMP/$family"
+    unzip -q "$TMP/$family.zip" -d "$TMP/$family"
+    backup ".local/share/fonts/auto-bspwm/$family"
+    mkdir -p "$HOME/.local/share/fonts/auto-bspwm/$family"
+    find "$TMP/$family" -type f \( -name '*.ttf' -o -name '*.otf' -o -iname '*license*' -o -iname '*ofl*' \) \
+        -exec cp -t "$HOME/.local/share/fonts/auto-bspwm/$family" -- {} +
+done
+fc-cache -f
+clone_repo p10k https://github.com/romkatv/powerlevel10k.git "$TMP/p10k"
+backup .powerlevel10k
+rm -rf -- "$HOME/.powerlevel10k"
+mv "$TMP/p10k" "$HOME/.powerlevel10k"
+clone_repo nvchad https://github.com/NvChad/starter.git "$TMP/nvim-config"
+backup .config/nvim
+mkdir -p "$HOME/.config"
+rm -rf -- "$HOME/.config/nvim"
+mv "$TMP/nvim-config" "$HOME/.config/nvim"
+if [[ -n $LOCK_FILE ]]; then
+    python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" lazy_lock > "$HOME/.config/nvim/lazy-lock.json"
+    clone_repo lazy https://github.com/folke/lazy.nvim.git "$TMP/lazy.nvim"
+    lazy_dir="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/lazy/lazy.nvim"
+    [[ $lazy_dir == "$HOME/"* ]] || die 'XDG_DATA_HOME debe estar dentro de HOME.'
+    backup "${lazy_dir#"$HOME/"}"
+    rm -rf -- "$lazy_dir"
+    mkdir -p "$(dirname "$lazy_dir")"
+    mv "$TMP/lazy.nvim" "$lazy_dir"
+fi
+for config in bspwm sxhkd polybar picom kitty; do
+    backup ".config/$config"
+    rm -rf -- "$HOME/.config/$config"
+    cp -a "$ROOT/Config/$config" "$HOME/.config/$config"
+done
+backup .config/bin
+mkdir -p "$HOME/.config/bin"
+cp "$ROOT"/Config/bin/*.sh "$HOME/.config/bin/"
+backup .config/rofi
+mkdir -p "$HOME/.config/rofi/themes"
+cp "$ROOT/rofi/nord.rasi" "$HOME/.config/rofi/themes/"
+printf '@theme "themes/nord.rasi"\n' > "$HOME/.config/rofi/config.rasi"
+for config in .zshrc .p10k.zsh; do backup "$config"; cp "$ROOT/$config" "$HOME/$config"; done
+for script in screenshot whichSystem.py; do
+    backup ".local/bin/$script"
+    install -m 755 "$ROOT/scripts/$script" "$HOME/.local/bin/$script"
+done
+if ! command -v bat >/dev/null && command -v batcat >/dev/null; then
+    backup .local/bin/bat
+    ln -sfn /usr/bin/batcat "$HOME/.local/bin/bat"
+fi
+chmod +x "$HOME/.config/bspwm/bspwmrc" "$HOME/.config/bspwm/scripts/"* \
+    "$HOME/.config/bin/"*.sh "$HOME/.config/polybar/launch.sh" "$HOME/.config/polybar/scripts/"{launcher,powermenu,powermenu_alt}
+if [[ -n $LOCK_FILE ]]; then
+    python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" python > "$TMP/constraints.txt"
+    PIP_CONSTRAINT="$TMP/constraints.txt" pipx install --force pwntools
+    nvim --headless '+Lazy! restore' +qa
+else
+    pipx install --force pwntools
+fi
+[[ -f /usr/share/xsessions/bspwm.desktop ]] || die 'No se encontró la sesión X11 de bspwm.'
+if "$CHANGE_SHELL"; then sudo chsh -s /usr/bin/zsh "$USER"; fi
+dpkg-query -W bspwm sxhkd polybar picom neovim kitty bat lsd code 2>/dev/null \
+    > "$STATE/packages-$RUN.txt" || true
+dpkg-query -W -f='${binary:Package}=${Version} ${db:Status-Status}\n' |
+    awk '$2 == "installed" { print $1 }' > "$RUN_DIR/apt-all.txt"
+if [[ $MODE == latest ]]; then
+    grep -Ev '^(bat|lsd|code)(:[^=]+)?=' "$RUN_DIR/apt-all.txt" > "$RUN_DIR/apt.txt"
+else
+    cp "$RUN_DIR/apt-all.txt" "$RUN_DIR/apt.txt"
+fi
+pipx runpip pwntools freeze > "$RUN_DIR/python.txt"
+touch "$RUN_DIR/complete"
+printf '\nInstalación completada. Cierra sesión y elige bspwm (X11).\nRespaldo: %s\nNvChad descargará sus plugins al abrir nvim.\n' "$BACKUP"
+printf 'Tras verificar el escritorio y abrir nvim, congela las versiones:\npython3 "%s/scripts/pins.py" freeze "%s" parrot-kali.lock.json\n' "$ROOT" "$RUN_DIR"

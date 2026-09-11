@@ -50,7 +50,7 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # Manual configuration
 
-PATH=/root/.local/bin:/snap/bin:/usr/sandbox/:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/usr/share/games:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/opt/nvim/bin:/opt/kitty/bin
+export PATH="$HOME/.local/bin:$PATH"
 
 # Custom Aliases
 
@@ -70,7 +70,7 @@ alias catnp='bat --style=plain --paging=never'
 source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #source /usr/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-sudo/sudo.plugin.zsh
+# sudo plugin omitted: avoid downloading executable shell code from a moving URL
 
 # Functions
 function mkt(){
@@ -91,14 +91,12 @@ function extractPorts(){
 
 # Settarget
 function settarget(){
-
-	if [ $# -eq 1 ]; then
-	echo $1 > ~/.config/bin/target
-	elif [ $# -gt 2 ]; then
-	echo "settarget [IP] [NAME] | settarget [IP]"
-	else
-	echo $1 $2 > ~/.config/bin/target
-	fi
+    mkdir -p "$HOME/.config/bin"
+    if (( $# > 2 )); then
+        print 'settarget [IP] [NAME]'
+        return 2
+    fi
+    printf '%s\n' "$*" > "$HOME/.config/bin/target"
 }
 
 # Set 'man' colors

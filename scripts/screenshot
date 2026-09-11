@@ -1,11 +1,10 @@
-#! /bin/sh
-
-output=~/ScreenShots/%Y-%m-%d-%T-screenshot.png
-
-case "$1" in
-	"select") scrot -s -q 100 -l mode=classic "$output" || exit ;;
-	"window") scrot -q 100 --focused -b "$output" || exit ;;
-	*) scrot "$output" || exit ;;
+#!/bin/sh
+set -eu
+mkdir -p "$HOME/ScreenShots"
+output="$HOME/ScreenShots/%Y-%m-%d-%H-%M-%S-screenshot.png"
+case "${1:-}" in
+    select) scrot -s -q 100 "$output" ;;
+    window) scrot -q 100 --focused -b "$output" ;;
+    *) scrot "$output" ;;
 esac
-
 notify-send "Screenshot taken."

@@ -1,9 +1,5 @@
 #!/bin/sh
-
-IFACE=$(/usr/sbin/ifconfig | grep tun0 | awk '{print $1}' | tr -d ':')
-
-if [ "$IFACE" = "tun0" ]; then
-	echo "%{F#1bbf3e} %{F#ffffff}$(/usr/sbin/ifconfig tun0 | grep "inet " | awk '{print $2}')%{u-}"
-else
-	echo "%{F#1bbf3e}%{u-} Disconnected"
-fi
+iface=${BSPWM_VPN_INTERFACE:-$(ip -o link show | awk -F': ' '$2 ~ /^(tun|tap|wg)[0-9]+/ {sub(/@.*/, "", $2); print $2; exit}')}
+address=
+[ -z "$iface" ] || address=$(ip -o -4 addr show dev "$iface" 2>/dev/null | awk 'NR==1 {split($4,a,"/"); print a[1]}')
+printf 'VPN %s\n' "${address:-Disconnected}"

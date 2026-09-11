@@ -1,0 +1,11 @@
+* text=auto
+Config/** text=auto eol=lf
+*.ttf binary
+*.otf binary
+*.sh text eol=lf
+*.py text eol=lf
+*.zsh text eol=lf
+.zshrc text eol=lf
+Config/bspwm/bspwmrc text eol=lf
+Config/polybar/scripts/* text eol=lf
+scripts/screenshot text eol=lf

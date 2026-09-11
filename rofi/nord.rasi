@@ -1,6 +1,6 @@
 configuration {
   show-icons: true;
-  font: "SauceCodePro Nerd Font Medium 10";
+  font: "Hack Nerd Font Medium 10";
   drun-display-format: "{icon} {name}";
   display-run: " ";
   display-drun: " ";
@@ -54,7 +54,7 @@ inputbar {
 
 prompt {
   enabled: true;
-  font: "SauceCodePro Nerd Font 12";
+  font: "Hack Nerd Font 12";
   padding: 12 0 0 12;
   text-color: @nord-yellow;
 }

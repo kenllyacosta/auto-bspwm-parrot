@@ -1,36 +1,11 @@
-#!/bin/bash
-
-
-rofi_command="rofi -theme ~/.config/polybar/scripts/themes/powermenu_alt.rasi"
-
-uptime=$(uptime -p | sed -e 's/up //g')
-
-# Options
-shutdown=" Shutdown"
-reboot=" Restart"
-lock=" Lock"
-suspend=" Sleep"
-logout=" Logout"
-
-# Variable passed to rofi
-options="$lock\n$suspend\n$logout\n$reboot\n$shutdown"
-
-chosen="$(echo -e "$options" | $rofi_command -p "System" -dmenu -selected-row 0)"
-case $chosen in
-    $shutdown)
-        systemctl poweroff
-        ;;
-    $reboot)
-        systemctl reboot
-        ;;
-    $lock)
-        i3lock
-        ;;
-    $suspend)
-        systemctl suspend
-        ;;
-    $logout)
-        kill -9 -1
-        ;;
+#!/usr/bin/env bash
+set -eu
+choice=$(printf 'Lock\nSleep\nLogout\nRestart\nShutdown\n' |
+    rofi -theme "$HOME/.config/polybar/scripts/themes/powermenu_alt.rasi" -p System -dmenu) || exit 0
+case "$choice" in
+    Lock) i3lock --color=2e3440 ;;
+    Sleep) loginctl lock-session; systemctl suspend ;;
+    Logout) bspc quit ;;
+    Restart) systemctl reboot ;;
+    Shutdown) systemctl poweroff ;;
 esac
-

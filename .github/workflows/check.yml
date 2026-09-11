@@ -18,3 +18,5 @@ jobs:
           zsh -n .zshrc
       - name: Python tests
         run: python3 -m unittest discover -s tests -v
+      - name: Shortcut guide stays synchronized
+        run: python3 scripts/build_shortcuts.py --check

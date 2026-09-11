@@ -69,6 +69,11 @@ y no se reinicia automáticamente.
 
 ## Uso del escritorio
 
+Consulta la **guía completa de atajos** en [Markdown](docs/shortcuts.md) o
+[HTML sin conexión e imprimible](docs/shortcuts.html). Incluye combinaciones de
+bspwm y Kitty, botones de Polybar, ejemplos y solución de problemas en VMware.
+Para abrir el HTML desde la raíz del repositorio: `xdg-open docs/shortcuts.html`.
+
 - Super + Enter: Kitty; Super + D: Rofi.
 - Super + Shift + L: bloquear; Super + Alt + Q: cerrar sesión bspwm.
 - Print: selección; Ctrl + Print: pantalla; Alt + Print: ventana.

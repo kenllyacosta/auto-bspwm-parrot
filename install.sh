@@ -25,6 +25,7 @@ die() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 (( EUID != 0 )) || die 'Ejecuta como usuario normal con acceso a sudo.'
 # shellcheck disable=SC1091
 source "$ROOT/scripts/platform.sh"
+source "$ROOT/scripts/apt.sh"
 detect_platform
 ARCH=$(dpkg --print-architecture)
 case "$ARCH" in
@@ -88,13 +89,13 @@ find /usr/share/xsessions /usr/share/wayland-sessions -maxdepth 1 -name '*.deskt
     -print 2>/dev/null > "$RUN_DIR/sessions-before.txt" || true
 [[ -s "$RUN_DIR/sessions-before.txt" ]] || die 'Se requiere un escritorio original para recuperación.'
 readlink -f /etc/systemd/system/display-manager.service > "$RUN_DIR/display-manager.txt" || true
-sudo apt-get update
-sudo apt-get --no-remove install -y ca-certificates curl gnupg python3
+apt_run update
+apt_run install -y ca-certificates curl gnupg python3
 source "$ROOT/scripts/cloudflare-one.sh"
 configure_cloudflare_one "$BACKUP/system" "$TMP" "$ARCH"
-sudo apt-get update
+apt_run update
 if "$UPGRADE"; then
-    sudo apt-get --no-remove full-upgrade -y
+    apt_run full-upgrade -y
     # base-files may update the distribution version during the upgrade.
     detect_platform
 fi
@@ -121,7 +122,7 @@ else
     done < "$RUN_DIR/hardware-candidates.txt"
 fi
 # Abort dependency resolution instead of removing the original desktop or login manager.
-sudo apt-get --no-remove install -y "${PACKAGES[@]}"
+apt_run install -y "${PACKAGES[@]}"
 python3 -c 'import json,sys; print(json.dumps(dict(zip(("id","version","arch","mode"), sys.argv[1:]))))' \
     "$ID" "${VERSION_ID:-rolling}" "$ARCH" "$MODE" > "$RUN_DIR/platform.json"
 python3 "$ROOT/scripts/pins.py" fingerprint > "$RUN_DIR/source.sha256"
@@ -161,9 +162,9 @@ EOF
     release --vscode "https://update.code.visualstudio.com/latest/linux-deb-$CODEARCH/stable" "$TMP/code.deb"
     chmod 755 "$TMP"
     printf 'code code/add-microsoft-repo boolean false\n' | sudo debconf-set-selections
-    sudo env DEBIAN_FRONTEND=noninteractive apt-get --no-remove install -y "$TMP/bat.deb" "$TMP/lsd.deb" "$TMP/code.deb"
+    apt_run install -y "$TMP/bat.deb" "$TMP/lsd.deb" "$TMP/code.deb"
 else
-    if [[ -z $LOCK_FILE ]]; then sudo apt-get --no-remove install -y neovim kitty bat lsd; fi
+    if [[ -z $LOCK_FILE ]]; then apt_run install -y neovim kitty bat lsd; fi
     for app in nvim kitty kitten; do
         if [[ -L "$HOME/.local/bin/$app" && $(readlink "$HOME/.local/bin/$app") == "$HOME/.local/opt/"* ]]; then
             backup ".local/bin/$app"

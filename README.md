@@ -62,6 +62,15 @@ Repetirlo vuelve a consultar versiones y aplicar la configuración del proyecto:
 si falla, puede haber paquetes ya instalados y configuraciones parcialmente aplicadas.
 Corrige el error indicado en el registro y vuelve a ejecutar.
 
+Las operaciones APT se ejecutan sin interfaz interactiva y sin su pseudoterminal
+para funcionar con el registro mediante `tee`. Se conservan los archivos de
+configuración modificados (`--force-confold` y la opción equivalente de UCF);
+revisa los posibles archivos `.dpkg-dist` después de actualizar, especialmente
+los repositorios de Parrot. `needrestart` enumera servicios pendientes de reinicio;
+programa un reinicio al finalizar. Los scripts propios de un paquete todavía
+pueden fallar o tardar, por lo que esto no garantiza que toda actualización termine.
+No ejecutes una segunda instalación ni borres los locks mientras APT/dpkg sigan activos.
+
 Registros, versiones APT, commits y sumas SHA-256 se guardan en
 `~/.local/state/auto-bspwm/`. Se verifica el digest de GitHub cuando está disponible;
 si upstream no lo publica se avisa y se usa HTTPS, sin afirmar verificación

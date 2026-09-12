@@ -3,8 +3,9 @@
 set -Eeuo pipefail
 [[ $(uname -s) == Linux ]] || { echo 'Se requiere Linux.' >&2; exit 1; }
 [[ $(systemd-detect-virt --vm) == vmware ]] || { echo 'Solo para invitados VMware.' >&2; exit 1; }
-source /etc/os-release
-[[ $ID == parrot || $ID == kali ]] || { echo 'Se requiere Parrot o Kali.' >&2; exit 1; }
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+source "$ROOT/scripts/platform.sh"
+detect_platform
 [[ $(dpkg --print-architecture) == amd64 ]] || { echo 'Este script requiere amd64.' >&2; exit 1; }
 sudo apt-get update
 sudo apt-get --no-remove install -y linux-image-amd64 open-vm-tools \

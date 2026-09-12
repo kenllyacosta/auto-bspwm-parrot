@@ -1,6 +1,8 @@
 # auto-bspwm — Parrot 7 y Kali Linux
 
 Entorno bspwm para **Parrot OS 7.x y Kali Rolling**, en **amd64 y arm64**.
+También reconoce las imágenes de Parrot 7 que declaran `ID=debian` junto con
+`NAME="Parrot Security"` o `NAME="Parrot Home"`; Debian genérico sigue excluido.
 Instalar en una edición de escritorio con usuario normal y sudo, conexión a Internet
 y repositorios oficiales funcionando. No mezclar repositorios de Kali y Parrot.
 
@@ -22,6 +24,7 @@ Se puede ejecutar desde cualquier directorio. Opciones:
 bash install.sh --help
 bash install.sh --change-shell
 bash install.sh --upgrade-system
+bash install.sh --no-system-upgrade
 bash install.sh --repo-only
 bash install.sh --locked parrot7-amd64.lock.json
 ```
@@ -33,16 +36,23 @@ bash install.sh --locked parrot7-amd64.lock.json
   candidato más reciente de los repositorios de la distribución tras actualizar
   sus índices. Esto **no equivale necesariamente a la última versión upstream**.
 - NvChad starter y Powerlevel10k se clonan desde sus ramas predeterminadas actuales;
-  se registra el commit. NvChad instala sus plugins al abrir Neovim por primera vez.
-  El antiguo `Config/nvim/init.lua` queda como referencia y no se instala.
+  se registra el commit. El instalador sincroniza los plugins de NvChad con Lazy
+  y conserva el ajuste de tabulaciones/espacios del Neovim original del proyecto.
+  El antiguo `Config/nvim/init.lua` queda como referencia: se aplica
+  `Config/nvim/project-options.lua` sobre el starter actual para evitar rutas obsoletas.
 - pwntools se instala/actualiza con pipx, aislado del Python del sistema.
   Para importar `pwn` desde tus propios scripts, crea un entorno con
   `python3 -m venv .venv`, actívalo e instala allí `pwntools`.
 - `--repo-only` usa APT para Neovim, Kitty, bat y lsd y omite VS Code; las fuentes,
   NvChad, Powerlevel10k y pwntools siguen requiriendo Internet.
-- `--upgrade-system` solicita además `apt-get --no-remove full-upgrade`.
-  Todas las operaciones APT abortan si requieren eliminar paquetes; se conserva
-  el escritorio original y su gestor de acceso. No se combina con `--locked`.
+- El sistema se actualiza por defecto con `apt-get --no-remove full-upgrade`;
+  `--upgrade-system` sigue disponible como alias explícito. Usa `--no-system-upgrade`
+  para omitir esa actualización. El modo `--locked` la desactiva automáticamente
+  y rechaza `--upgrade-system` explícito. Todas las operaciones APT abortan si
+  requieren eliminar paquetes para proteger el escritorio original. Si APT se
+  detiene por esa razón, revisa la transición de paquetes antes de continuar.
+  Se usan las actualizaciones de los repositorios configurados: no se cambian
+  ramas ni se migra automáticamente a una futura versión mayor no compatible.
 - `--change-shell` cambia a Zsh la shell de tu usuario; Kitty ya inicia Zsh.
 
 El instalador reemplaza las configuraciones administradas, pero antes guarda una
@@ -64,8 +74,43 @@ Los antiguos `*.deb`, `kitty/`, `fonts/HNF/` y las fuentes binarias de Polybar
 El historial Git no se reescribió. Se usan las Nerd Fonts descargadas con sus
 avisos de licencia, sin depender de Helvetica ni de archivos de licencia incierta.
 No se instala Python 2, pip2 ni el fork antiguo de Picom.
-No se alteran fuentes APT ni claves, no se modifica root, no se borra el repositorio
+Se añade exclusivamente el repositorio oficial del cliente Cloudflare One con
+su clave limitada mediante `signed-by`; se respaldan los archivos previos en
+el respaldo de la ejecución, bajo `system/`. No se modifica root, no se borra el repositorio
 y no se reinicia automáticamente.
+
+## Cloudflare One y Neovim
+
+El instalador detecta hardware y añade controladores disponibles en los repositorios:
+Mesa, núcleo amd64, microcódigo Intel/AMD en equipos físicos, firmware gráfico y
+firmware de red para los módulos reconocidos. En VMware, VirtualBox y KVM/QEMU
+selecciona herramientas del invitado. Guarda los candidatos en
+`hardware-candidates.txt`; los paquetes sin candidato se notifican y se omiten.
+No descarga instaladores de fabricantes ni sustituye automáticamente un controlador
+NVIDIA por el propietario. En ARM conserva el núcleo específico ya instalado;
+dispositivos sin controlador cargado o no reconocidos pueden requerir ajustes manuales.
+Tras una actualización de núcleo/controladores puede ser necesario reiniciar.
+El modo `--locked` reproduce los paquetes del lock, por lo que debe usarse en un
+equipo/clon compatible con el hardware de la instalación capturada.
+
+Cloudflare One Client (paquete `cloudflare-warp`) se instala desde el
+[repositorio oficial](https://pkg.cloudflareclient.com/), usando la suite Debian
+13 `trixie` para Parrot 7 y Kali actuales. APT instala su versión candidata y
+la registra entre los paquetes del lock. También se incluye en `--repo-only`.
+Cloudflare publica soporte para Debian; Parrot/Kali son derivados y requieren
+validación propia. El instalador no inscribe el dispositivo ni ejecuta `warp-cli connect`.
+
+Después de instalar, consulta `warp-cli --version`, `warp-cli status` y la
+[guía de inscripción](https://developers.cloudflare.com/cloudflare-one/team-and-resources/devices/cloudflare-one-client/deployment/manual-deployment/).
+La organización Zero Trust y sus políticas determinan el acceso. Realiza la
+conexión desde la consola de la VM cuando estés preparado para cambiar sus rutas.
+
+El script original utilizaba los plugins de **NvChad**, sin una lista adicional
+de plugins propios en este repositorio. Ahora se inicializan durante la instalación;
+puedes revisarlos con `:Lazy` dentro de Neovim y gestionar servidores de lenguaje
+con las herramientas de la versión instalada de NvChad. Los servidores LSP y
+formateadores externos pueden requerir instalación adicional. No se instala
+una configuración de Neovim para root.
 
 ## Uso del escritorio
 
@@ -87,7 +132,14 @@ Para abrir el HTML desde la raíz del repositorio: `xdg-open docs/shortcuts.html
   Omite módulos secundarios en resoluciones pequeñas. Para recuperar el diseño
   anterior exporta `BSPWM_BAR_LAYOUT=classic` antes de iniciar bspwm.
 - El audio usa PulseAudio o la compatibilidad PulseAudio de PipeWire.
-- Para el fondo ejecuta `feh --bg-fill /ruta/imagen.jpg`; se recupera en el próximo inicio.
+- Al aplicar la configuración se conserva el fondo estático seleccionado en KDE,
+  Xfce, GNOME, MATE o Cinnamon cuando su imagen local puede detectarse. Se respalda
+  `~/.fehbg` antes de actualizarlo; una configuración existente de bspwm se conserva.
+  Si hay varios fondos/monitores, se usa la primera imagen local detectada en todos
+  los monitores. No se trasladan presentaciones, fondos animados ni sus plugins.
+  Para elegir otro fondo ejecuta `feh --bg-fill /ruta/imagen.jpg`; se recupera en
+  el próximo inicio. Si no se detecta una imagen, se mantiene el mecanismo de
+  recuperación anterior (`~/.fehbg`, imagen del sistema o color de respaldo).
 - Burp Suite y SecLists no forman parte de la instalación básica; instálalos
   desde los repositorios si los necesitas. El atajo de Burp requiere ese paquete.
 

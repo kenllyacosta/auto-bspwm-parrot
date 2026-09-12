@@ -3,7 +3,8 @@ set -Eeuo pipefail
 umask 022
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 MODE=latest
-UPGRADE=false
+UPGRADE=true
+UPGRADE_REQUESTED=false
 CHANGE_SHELL=false
 LOCK_FILE=
 while (( $# )); do
@@ -11,9 +12,10 @@ while (( $# )); do
     case "$arg" in
         --locked) (( $# >= 2 )) || { printf 'Falta el archivo de versiones\n' >&2; exit 2; }; LOCK_FILE=$(realpath -- "$2"); shift ;;
         --repo-only) MODE=repo ;;
-        --upgrade-system) UPGRADE=true ;;
+        --upgrade-system) UPGRADE=true; UPGRADE_REQUESTED=true ;;
+        --no-system-upgrade) UPGRADE=false; UPGRADE_REQUESTED=false ;;
         --change-shell) CHANGE_SHELL=true ;;
-        --help|-h) printf 'Uso: bash install.sh [--repo-only] [--upgrade-system] [--change-shell] [--locked ARCHIVO]\n'; exit 0 ;;
+        --help|-h) printf 'Uso: bash install.sh [--repo-only] [--no-system-upgrade] [--change-shell] [--locked ARCHIVO]\nActualiza el sistema por defecto; --locked conserva las versiones fijadas.\n'; exit 0 ;;
         *) printf 'Opción desconocida: %s\n' "$arg" >&2; exit 2 ;;
     esac
     shift
@@ -22,12 +24,8 @@ die() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 [[ $(uname -s) == Linux ]] || die 'Ejecuta este instalador en Linux.'
 (( EUID != 0 )) || die 'Ejecuta como usuario normal con acceso a sudo.'
 # shellcheck disable=SC1091
-source /etc/os-release
-case "$ID" in
-    parrot) [[ ${VERSION_ID%%.*} == 7 ]] || die 'Se requiere Parrot 7.x.' ;;
-    kali) ;;
-    *) die 'Distribución compatible: Parrot 7.x o Kali Linux.' ;;
-esac
+source "$ROOT/scripts/platform.sh"
+detect_platform
 ARCH=$(dpkg --print-architecture)
 case "$ARCH" in
     amd64) NVARCH=x86_64; KITARCH=x86_64; CODEARCH=x64 ;;
@@ -35,7 +33,8 @@ case "$ARCH" in
     *) die 'Arquitectura compatible: amd64 o arm64.' ;;
 esac
 if [[ -n $LOCK_FILE ]]; then
-    "$UPGRADE" && die '--locked no permite actualizar el sistema.'
+    "$UPGRADE_REQUESTED" && die '--locked no permite actualizar el sistema.'
+    UPGRADE=false
     command -v python3 >/dev/null || die 'El modo fijo requiere Python 3 instalado.'
     python3 "$ROOT/scripts/pins.py" check "$LOCK_FILE" "$ID" "${VERSION_ID:-rolling}" "$ARCH"
     MODE=$(python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" mode)
@@ -90,8 +89,14 @@ find /usr/share/xsessions /usr/share/wayland-sessions -maxdepth 1 -name '*.deskt
 [[ -s "$RUN_DIR/sessions-before.txt" ]] || die 'Se requiere un escritorio original para recuperación.'
 readlink -f /etc/systemd/system/display-manager.service > "$RUN_DIR/display-manager.txt" || true
 sudo apt-get update
+sudo apt-get --no-remove install -y ca-certificates curl gnupg python3
+source "$ROOT/scripts/cloudflare-one.sh"
+configure_cloudflare_one "$BACKUP/system" "$TMP" "$ARCH"
+sudo apt-get update
 if "$UPGRADE"; then
     sudo apt-get --no-remove full-upgrade -y
+    # base-files may update the distribution version during the upgrade.
+    detect_platform
 fi
 PACKAGES=(bspwm sxhkd polybar picom xserver-xorg xinit dbus-x11 \
     x11-xserver-utils x11-utils xauth curl ca-certificates git python3 python3-venv \
@@ -100,10 +105,20 @@ PACKAGES=(bspwm sxhkd polybar picom xserver-xorg xinit dbus-x11 \
     plocate fastfetch wmname acpi fzf ripgrep numlockx iproute2 iputils-ping scrub \
     libnotify-bin dunst i3lock xss-lock network-manager-gnome lxpolkit \
     zsh-syntax-highlighting zsh-autosuggestions ranger file firefox-esr pavucontrol kitty-terminfo \
-    libgl1 libegl1 libxkbcommon-x11-0 libfontconfig1)
+    libgl1 libegl1 libxkbcommon-x11-0 libfontconfig1 gnupg cloudflare-warp)
 if [[ -n $LOCK_FILE ]]; then
     python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" apt > "$TMP/apt.txt"
     mapfile -t PACKAGES < "$TMP/apt.txt"
+else
+    python3 "$ROOT/scripts/hardware.py" > "$RUN_DIR/hardware-candidates.txt"
+    while IFS= read -r package; do
+        candidate=$(LC_ALL=C apt-cache policy "$package" | awk '/Candidate:/ {print $2}')
+        if [[ -n $candidate && $candidate != '(none)' ]]; then
+            PACKAGES+=("$package")
+        else
+            printf 'Controlador no disponible en los repositorios configurados: %s\n' "$package"
+        fi
+    done < "$RUN_DIR/hardware-candidates.txt"
 fi
 # Abort dependency resolution instead of removing the original desktop or login manager.
 sudo apt-get --no-remove install -y "${PACKAGES[@]}"
@@ -180,6 +195,8 @@ backup .config/nvim
 mkdir -p "$HOME/.config"
 rm -rf -- "$HOME/.config/nvim"
 mv "$TMP/nvim-config" "$HOME/.config/nvim"
+cp "$ROOT/Config/nvim/project-options.lua" "$HOME/.config/nvim/project-options.lua"
+printf '\n-- auto-bspwm customizations\ndofile(vim.fn.stdpath("config") .. "/project-options.lua")\n' >> "$HOME/.config/nvim/init.lua"
 if [[ -n $LOCK_FILE ]]; then
     python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" lazy_lock > "$HOME/.config/nvim/lazy-lock.json"
     clone_repo lazy https://github.com/folke/lazy.nvim.git "$TMP/lazy.nvim"
@@ -197,7 +214,9 @@ if [[ -n $LOCK_FILE ]]; then
     nvim --headless '+Lazy! restore' +qa
 else
     pipx install --force pwntools
+    nvim --headless '+Lazy! sync' +qa
 fi
+[[ -s "$HOME/.config/nvim/lazy-lock.json" ]] || die 'NvChad no generó su lock de plugins; revisa el registro.'
 [[ -f /usr/share/xsessions/bspwm.desktop ]] || die 'No se encontró la sesión X11 de bspwm.'
 if "$CHANGE_SHELL"; then sudo chsh -s /usr/bin/zsh "$USER"; fi
 dpkg-query -W bspwm sxhkd polybar picom neovim kitty bat lsd code 2>/dev/null \
@@ -211,5 +230,5 @@ else
 fi
 pipx runpip pwntools freeze > "$RUN_DIR/python.txt"
 touch "$RUN_DIR/complete"
-printf '\nInstalación completada. Cierra sesión y elige bspwm (X11).\nRespaldo: %s\nNvChad descargará sus plugins al abrir nvim.\n' "$BACKUP"
+printf '\nInstalación completada. Cierra sesión y elige bspwm (X11).\nRespaldo: %s\nPlugins de NvChad inicializados. Cloudflare One instalado; inscripción y conexión pendientes.\n' "$BACKUP"
 printf 'Tras verificar el escritorio y abrir nvim, congela las versiones:\npython3 "%s/scripts/pins.py" freeze "%s" parrot-kali.lock.json\n' "$ROOT" "$RUN_DIR"

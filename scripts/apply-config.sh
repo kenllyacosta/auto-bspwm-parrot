@@ -18,6 +18,8 @@ backup() {
     fi
 }
 mkdir -p "$HOME/.config" "$HOME/.local/bin"
+backup .fehbg
+python3 "$ROOT/scripts/preserve-wallpaper.py"
 for config in bspwm sxhkd polybar picom kitty; do
     backup ".config/$config"
     rm -rf -- "$HOME/.config/$config"

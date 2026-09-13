@@ -30,7 +30,7 @@ bash install.sh --locked parrot7-amd64.lock.json
 ```
 
 - Por defecto instala las últimas publicaciones estables de Neovim, Kitty, bat,
-  lsd y Nerd Fonts (Hack, Iosevka y Hurmit), consultando GitHub al ejecutar.
+  lsd y Nerd Fonts (archivos Hack, Iosevka y Hermit), consultando GitHub al ejecutar.
   VS Code se descarga del canal estable oficial de Microsoft.
 - bspwm, sxhkd, Polybar, Picom, Python 3, fzf y el resto de herramientas usan el
   candidato más reciente de los repositorios de la distribución tras actualizar

@@ -177,7 +177,9 @@ else
         rm -- "$HOME/.local/share/applications/kitty.desktop"
     fi
 fi
-for family in Hack Iosevka Hurmit; do
+# Make the installed X11 session usable before optional downloads can fail.
+BSPWM_CONFIG_BACKUP="$BACKUP" bash "$ROOT/scripts/apply-config.sh"
+for family in Hack Iosevka Hermit; do
     release ryanoasis/nerd-fonts "$family.zip" "$TMP/$family.zip"
     mkdir "$TMP/$family"
     unzip -q "$TMP/$family.zip" -d "$TMP/$family"
@@ -208,7 +210,6 @@ if [[ -n $LOCK_FILE ]]; then
     mkdir -p "$(dirname "$lazy_dir")"
     mv "$TMP/lazy.nvim" "$lazy_dir"
 fi
-BSPWM_CONFIG_BACKUP="$BACKUP" bash "$ROOT/scripts/apply-config.sh"
 if [[ -n $LOCK_FILE ]]; then
     python3 "$ROOT/scripts/pins.py" get "$LOCK_FILE" python > "$TMP/constraints.txt"
     PIP_CONSTRAINT="$TMP/constraints.txt" pipx install --force pwntools

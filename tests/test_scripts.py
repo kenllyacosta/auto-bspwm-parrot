@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 import io
 import hashlib
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -23,6 +24,19 @@ system = load("whichSystem")
 
 
 class Releases(unittest.TestCase):
+    def test_installer_font_archives(self):
+        # Asset names published by nerd-fonts v3.5.1; Hurmit is a font family,
+        # whereas the downloadable archive is named Hermit.zip.
+        data = {"assets": [{"name": name} for name in
+                           ("Hack.zip", "Iosevka.zip", "Hermit.zip")]}
+        installer = (ROOT / "install.sh").read_text()
+        families = re.search(r"for family in (.+); do", installer).group(1).split()
+        for family in families:
+            with self.subTest(family=family):
+                release.select_asset(data, family + ".zip")
+        self.assertLess(installer.index('bash "$ROOT/scripts/apply-config.sh"'),
+                        installer.index("for family in"))
+
     def test_architecture_and_ambiguity(self):
         data = {"assets": [{"name": "bat_1_amd64.deb"}, {"name": "bat_1_arm64.deb"}]}
         self.assertEqual(release.select_asset(data, "bat_*_arm64.deb")["name"], "bat_1_arm64.deb")

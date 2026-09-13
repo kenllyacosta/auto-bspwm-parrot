@@ -213,3 +213,37 @@ python3 scripts/build_shortcuts.py
 ```
 
 La generación usa solo la biblioteca estándar de Python. El HTML contiene sus estilos, permite imprimir y se abre sin conexión; no carga fuentes, scripts ni servicios externos. Los enlaces a archivos del proyecto necesitan conservar la estructura del repositorio.
+
+## 13. Capturas de instalación y uso
+
+Capturas aportadas por el usuario de su instalación de Parrot. Ilustran las etapas y el aspecto del entorno; las versiones, direcciones de red y aplicaciones visibles corresponden a esa máquina. El instalador conserva el fondo que encuentre configurado, por lo que el tuyo puede ser distinto. En HTML puedes pulsar cada imagen para verla a tamaño completo. Conserva la carpeta `images` junto al HTML para verlas sin conexión.
+
+### Actualización de paquetes
+
+La terminal muestra la descarga de paquetes desde los repositorios de Parrot durante la actualización. Esta etapa puede tardar según la conexión y la cantidad de paquetes pendientes; la captura todavía no muestra el final de la instalación.
+
+![Descarga de paquetes de Parrot desde la sesión de escritorio original](images/01-actualizacion-parrot.png)
+
+### Escritorio BSPWM
+
+La sesión muestra el fondo de Parrot conservado y la barra superior con los escritorios I a X. A la derecha aparecen la red, el estado VPN, el objetivo y el volumen. Los valores son ejemplos de esta instalación. Usa Super + 1 a Super + 9, o Super + 0 para el décimo escritorio.
+
+![BSPWM con el fondo de Parrot y los indicadores de la barra superior](images/02-escritorio-bspwm.png)
+
+### Terminal
+
+El terminal presenta un prompt con iconos y un fondo translúcido que deja ver el wallpaper. Puedes abrir Kitty con Super + Enter; consulta las secciones anteriores para copiar, pegar y gestionar sus pestañas.
+
+![Terminal con prompt de Powerlevel10k e iconos sobre el escritorio BSPWM](images/03-terminal.png)
+
+### Visual Studio Code
+
+Visual Studio Code aparece abierto en el escritorio II. Puedes iniciarlo desde el lanzador de aplicaciones o ejecutando `code` en la terminal. El aviso Restricted Mode pertenece a la confianza del espacio de trabajo de VS Code.
+
+![Pantalla de bienvenida de Visual Studio Code en el segundo escritorio](images/04-vscode.png)
+
+### Neovim
+
+La captura muestra Neovim con numeración de líneas, barra de estado y el indicador NORMAL. El búfer visible está vacío y lleva el nombre `install.sh`. Abre el editor con `nvim`; pulsa `i` para insertar texto y Esc para regresar al modo normal. Para salir sin guardar cambios, escribe `:q!` y pulsa Enter.
+
+![Neovim en modo normal con un búfer vacío llamado install.sh](images/05-neovim.png)

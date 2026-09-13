@@ -20,6 +20,7 @@ main {min-width:0;background:var(--paper);padding:36px 42px;border:1px solid var
 h1 {font-size:clamp(1.8rem,3vw,2.65rem);line-height:1.17;letter-spacing:-.035em;margin:0 0 24px;max-width:760px}
 main h2 {font-size:1.45rem;line-height:1.35;margin:48px 0 18px;padding-top:22px;border-top:2px solid var(--line)}
 p {margin:0 0 18px}li{margin:6px 0}strong{font-weight:650}
+figure {margin:24px 0;break-inside:avoid}figure img {display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px}figcaption {margin-top:8px;color:var(--muted);font-size:14px}
 .table-wrap {overflow-x:auto;margin:20px 0 24px;border:1px solid var(--line);border-radius:8px}
 table {width:100%;border-collapse:collapse;font-size:14px;line-height:1.55}
 th {background:#e5f1f3;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
@@ -47,7 +48,8 @@ footer {max-width:1320px;margin:0 auto 32px;padding:0 24px;color:var(--muted);fo
 <li><a href="#9-atajos-propios-de-kitty">9. Atajos propios de Kitty</a></li>
 <li><a href="#10-botones-de-polybar">10. Botones de Polybar</a></li>
 <li><a href="#11-recargar-salir-y-recuperar-el-escritorio">11. Recargar, salir y recuperar el escritorio</a></li>
-<li><a href="#12-personalizar-y-mantener-esta-guia">12. Personalizar y mantener esta guía</a></li></ol><a class="download" href="shortcuts.md">Versión Markdown</a></nav>
+<li><a href="#12-personalizar-y-mantener-esta-guia">12. Personalizar y mantener esta guía</a></li>
+<li><a href="#13-capturas-de-instalacion-y-uso">13. Capturas de instalación y uso</a></li></ol><a class="download" href="shortcuts.md">Versión Markdown</a></nav>
 <main id="contenido"><h1 id="guia-de-atajos-parrot-y-kali-con-bspwm">Guía de atajos — Parrot y Kali con bspwm</h1>
 <p>Guía del teclado y los botones configurados por este repositorio. Disponible también como <a href="shortcuts.html">HTML para abrir sin conexión</a>. Está pensada para la sesión <strong>bspwm sobre X11</strong>, con sxhkd, Kitty y Polybar instalados por el proyecto.</p>
 <h2 id="1-antes-de-empezar">1. Antes de empezar</h2>
@@ -109,6 +111,23 @@ sxhkd &gt; &quot;$HOME/.cache/sxhkd-manual.log&quot; 2&gt;&amp;1 &amp;</code></p
 <p><strong>Teclado español:</strong> corchetes, coma, punto y acento grave dependen de los símbolos que genere tu distribución. Si una combinación no sale con facilidad, cámbiala por otra libre en sxhkd y recarga. No asumas que la posición física de un teclado estadounidense coincide con la tuya.</p>
 <p>La guía no fija atajos de NvChad: el instalador descarga su configuración actual y pueden variar entre versiones. Para el gestor y el terminal, actualiza este Markdown cuando cambies sus asignaciones y regenera el HTML con:</p>
 <pre><code>python3 scripts/build_shortcuts.py</code></pre>
-<p>La generación usa solo la biblioteca estándar de Python. El HTML contiene sus estilos, permite imprimir y se abre sin conexión; no carga fuentes, scripts ni servicios externos. Los enlaces a archivos del proyecto necesitan conservar la estructura del repositorio.</p></main></div>
+<p>La generación usa solo la biblioteca estándar de Python. El HTML contiene sus estilos, permite imprimir y se abre sin conexión; no carga fuentes, scripts ni servicios externos. Los enlaces a archivos del proyecto necesitan conservar la estructura del repositorio.</p>
+<h2 id="13-capturas-de-instalacion-y-uso">13. Capturas de instalación y uso</h2>
+<p>Capturas aportadas por el usuario de su instalación de Parrot. Ilustran las etapas y el aspecto del entorno; las versiones, direcciones de red y aplicaciones visibles corresponden a esa máquina. El instalador conserva el fondo que encuentre configurado, por lo que el tuyo puede ser distinto. En HTML puedes pulsar cada imagen para verla a tamaño completo. Conserva la carpeta <code>images</code> junto al HTML para verlas sin conexión.</p>
+<h3 id="actualizacion-de-paquetes">Actualización de paquetes</h3>
+<p>La terminal muestra la descarga de paquetes desde los repositorios de Parrot durante la actualización. Esta etapa puede tardar según la conexión y la cantidad de paquetes pendientes; la captura todavía no muestra el final de la instalación.</p>
+<figure><a href="images/01-actualizacion-parrot.png"><img src="images/01-actualizacion-parrot.png" alt="Descarga de paquetes de Parrot desde la sesión de escritorio original" loading="lazy"></a><figcaption>Descarga de paquetes de Parrot desde la sesión de escritorio original</figcaption></figure>
+<h3 id="escritorio-bspwm">Escritorio BSPWM</h3>
+<p>La sesión muestra el fondo de Parrot conservado y la barra superior con los escritorios I a X. A la derecha aparecen la red, el estado VPN, el objetivo y el volumen. Los valores son ejemplos de esta instalación. Usa Super + 1 a Super + 9, o Super + 0 para el décimo escritorio.</p>
+<figure><a href="images/02-escritorio-bspwm.png"><img src="images/02-escritorio-bspwm.png" alt="BSPWM con el fondo de Parrot y los indicadores de la barra superior" loading="lazy"></a><figcaption>BSPWM con el fondo de Parrot y los indicadores de la barra superior</figcaption></figure>
+<h3 id="terminal">Terminal</h3>
+<p>El terminal presenta un prompt con iconos y un fondo translúcido que deja ver el wallpaper. Puedes abrir Kitty con Super + Enter; consulta las secciones anteriores para copiar, pegar y gestionar sus pestañas.</p>
+<figure><a href="images/03-terminal.png"><img src="images/03-terminal.png" alt="Terminal con prompt de Powerlevel10k e iconos sobre el escritorio BSPWM" loading="lazy"></a><figcaption>Terminal con prompt de Powerlevel10k e iconos sobre el escritorio BSPWM</figcaption></figure>
+<h3 id="visual-studio-code">Visual Studio Code</h3>
+<p>Visual Studio Code aparece abierto en el escritorio II. Puedes iniciarlo desde el lanzador de aplicaciones o ejecutando <code>code</code> en la terminal. El aviso Restricted Mode pertenece a la confianza del espacio de trabajo de VS Code.</p>
+<figure><a href="images/04-vscode.png"><img src="images/04-vscode.png" alt="Pantalla de bienvenida de Visual Studio Code en el segundo escritorio" loading="lazy"></a><figcaption>Pantalla de bienvenida de Visual Studio Code en el segundo escritorio</figcaption></figure>
+<h3 id="neovim">Neovim</h3>
+<p>La captura muestra Neovim con numeración de líneas, barra de estado y el indicador NORMAL. El búfer visible está vacío y lleva el nombre <code>install.sh</code>. Abre el editor con <code>nvim</code>; pulsa <code>i</code> para insertar texto y Esc para regresar al modo normal. Para salir sin guardar cambios, escribe <code>:q!</code> y pulsa Enter.</p>
+<figure><a href="images/05-neovim.png"><img src="images/05-neovim.png" alt="Neovim en modo normal con un búfer vacío llamado install.sh" loading="lazy"></a><figcaption>Neovim en modo normal con un búfer vacío llamado install.sh</figcaption></figure></main></div>
 <footer>Guía basada en la configuración del repositorio. Abre el diálogo de impresión del navegador para imprimir o guardar como PDF.</footer>
 </body></html>

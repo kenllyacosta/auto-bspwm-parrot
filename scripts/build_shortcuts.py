@@ -2,7 +2,7 @@
 """Render docs/shortcuts.md as a standalone HTML guide (stdlib only).
 
 Supports the guide's Markdown subset: headings, paragraphs, unordered lists,
-tables, fenced code, links, inline code and emphasis. Keep Markdown as the source.
+tables, fenced code, images, links, inline code and emphasis. Keep Markdown as the source.
 """
 import argparse
 import html
@@ -53,6 +53,11 @@ def render(markdown):
             if i == len(lines):
                 raise ValueError("Unclosed Markdown code fence")
             blocks.append('<pre><code>' + html.escape("\n".join(code)) + '</code></pre>')
+        elif re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", line):
+            match = re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", line)
+            alt = html.escape(match[1], quote=True)
+            src = html.escape(match[2], quote=True)
+            blocks.append(f'<figure><a href="{src}"><img src="{src}" alt="{alt}" loading="lazy"></a><figcaption>{alt}</figcaption></figure>')
         elif line.startswith("#"):
             match = re.fullmatch(r"(#{1,6}) (.+)", line)
             if not match:
@@ -113,6 +118,7 @@ main {min-width:0;background:var(--paper);padding:36px 42px;border:1px solid var
 h1 {font-size:clamp(1.8rem,3vw,2.65rem);line-height:1.17;letter-spacing:-.035em;margin:0 0 24px;max-width:760px}
 main h2 {font-size:1.45rem;line-height:1.35;margin:48px 0 18px;padding-top:22px;border-top:2px solid var(--line)}
 p {margin:0 0 18px}li{margin:6px 0}strong{font-weight:650}
+figure {margin:24px 0;break-inside:avoid}figure img {display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px}figcaption {margin-top:8px;color:var(--muted);font-size:14px}
 .table-wrap {overflow-x:auto;margin:20px 0 24px;border:1px solid var(--line);border-radius:8px}
 table {width:100%;border-collapse:collapse;font-size:14px;line-height:1.55}
 th {background:#e5f1f3;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em}

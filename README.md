@@ -10,6 +10,15 @@ Parrot 7 usa KDE Plasma 6/Wayland por defecto. Este proyecto añade una sesión
 **bspwm sobre X11**; selecciona bspwm en el gestor de acceso después de cerrar sesión.
 No sustituye KDE/Xfce ni configura bspwm como compositor Wayland.
 
+## Capturas de pantalla
+
+![Escritorio BSPWM con el fondo de Parrot conservado](docs/images/02-escritorio-bspwm.png)
+
+Consulta la galería comentada con las cinco capturas de instalación, escritorio,
+terminal, Visual Studio Code y Neovim en la
+[guía Markdown](docs/shortcuts.md#13-capturas-de-instalacion-y-uso) o en la
+[guía HTML](docs/shortcuts.html#13-capturas-de-instalacion-y-uso).
+
 ## Instalación
 
 Desde el repositorio:

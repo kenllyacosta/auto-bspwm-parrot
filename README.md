@@ -12,7 +12,44 @@ No sustituye KDE/Xfce ni configura bspwm como compositor Wayland.
 
 ## Capturas de pantalla
 
+Capturas aportadas por el usuario de su instalación de Parrot. Las versiones y los
+indicadores de red corresponden a esa máquina; el fondo se conserva según la
+configuración existente de cada usuario.
+
+### Actualización de Parrot
+
+Descarga de paquetes desde los repositorios de Parrot durante la instalación.
+Esta etapa precede al mensaje final «Instalación completada».
+
+![Descarga de paquetes de Parrot desde la sesión de escritorio original](docs/images/01-actualizacion-parrot.png)
+
+### Escritorio BSPWM
+
+Escritorio con el fondo de Parrot conservado y la barra superior con los espacios
+de trabajo, la red, el estado VPN, el objetivo y el volumen.
+
 ![Escritorio BSPWM con el fondo de Parrot conservado](docs/images/02-escritorio-bspwm.png)
+
+### Terminal
+
+Terminal con prompt de Powerlevel10k, iconos y fondo translúcido. Puedes abrir
+Kitty con **Super + Enter**.
+
+![Terminal con prompt de Powerlevel10k sobre el escritorio BSPWM](docs/images/03-terminal.png)
+
+### Visual Studio Code
+
+Pantalla de bienvenida de Visual Studio Code en el escritorio II. Se puede abrir
+desde el lanzador de aplicaciones o con `code` en la terminal.
+
+![Visual Studio Code abierto en el segundo escritorio](docs/images/04-vscode.png)
+
+### Neovim
+
+Neovim con numeración de líneas y barra de estado en modo NORMAL. La captura
+muestra un búfer vacío llamado `install.sh`; abre el editor ejecutando `nvim`.
+
+![Neovim en modo normal con un búfer vacío llamado install.sh](docs/images/05-neovim.png)
 
 Consulta la galería comentada con las cinco capturas de instalación, escritorio,
 terminal, Visual Studio Code y Neovim en la
